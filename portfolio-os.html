@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>shardul@brahm: ~ — BrahmShilp</title>
+<meta name="description" content="Shardul Khanduri — condensed-matter researcher and agentic-AI builder. Thin-film fabrication, DFT/DFPT, and BRAHM, a multi-agent AI research system.">
+<meta property="og:title" content="BrahmShilp — Shardul Khanduri">
+<meta property="og:description" content="Condensed-matter researcher and agentic-AI builder. Thin-film fabrication, DFT/DFPT, and BRAHM, a multi-agent AI research system.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0A0805">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230A0805'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23C9A227' font-family='monospace'%3E%E0%A4%AC%3C/text%3E%3C/svg%3E">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+  :root{
+    --bg:#0A0805;
+    --bg2:#171310;
+    --panel:rgba(30,25,19,0.68);
+    --panel-solid:#1E1913;
+    --panel2:rgba(36,30,22,0.78);
+    --glass-border:rgba(201,162,39,0.14);
+    --line:#33291d;
+    --text:#F1E9D8;
+    --muted:#B8A98C;
+    --faint:#6E634E;
+    --crimson:#C9A227;
+    --crimson-dim:rgba(201,162,39,0.30);
+    --plasma:#F3ECD9;
+    --plasma-dim:rgba(243,236,217,0.22);
+    --ember:#C2703D;
+    --shadow-lg: 0 24px 70px rgba(0,0,0,0.6), 0 2px 0 rgba(255,255,255,0.03) inset;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 12% -8%, rgba(201,162,39,0.14), transparent 62%),
+      radial-gradient(ellipse 700px 500px at 92% 8%, rgba(243,236,217,0.06), transparent 60%),
+      radial-gradient(ellipse 900px 700px at 50% 118%, rgba(194,112,61,0.07), transparent 60%),
+      linear-gradient(165deg, #14100A 0%, #0A0805 45%, #0B0906 100%);
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    overflow:hidden;
+    height:100vh;
+    position:relative;
+    user-select:none;
+  }
+  /* film-grain overlay for texture, subtle */
+  body::before{
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:2; opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* looping desktop background video, sits behind all OS chrome */
+  #desktop-bg{
+    position:fixed; inset:0; z-index:0; width:100%; height:100%;
+    object-fit:cover; object-position:50% 18%; pointer-events:none;
+  }
+  #desktop-bg-tint{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:
+      radial-gradient(ellipse 900px 500px at 12% -8%, rgba(201,162,39,0.14), transparent 62%),
+      radial-gradient(ellipse 700px 500px at 92% 8%, rgba(243,236,217,0.06), transparent 60%),
+      radial-gradient(ellipse 900px 700px at 50% 118%, rgba(194,112,61,0.07), transparent 60%),
+      linear-gradient(165deg, rgba(20,16,10,0.55) 0%, rgba(10,8,5,0.6) 45%, rgba(11,9,6,0.65) 100%);
+  }
+  h1,h2,h3,.display{ font-family:'Space Grotesk', sans-serif; }
+  ::selection{ background:var(--crimson-dim); }
+  a{ color:var(--plasma); text-underline-offset:3px; }
+  :focus-visible{ outline:2px solid var(--plasma); outline-offset:2px; border-radius:2px; }
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration:0.01ms !important; } }
+
+  /* thin custom scrollbars for the glass panels */
+  .win-body::-webkit-scrollbar{ width:8px; }
+  .win-body::-webkit-scrollbar-track{ background:transparent; }
+  .win-body::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px; }
+  .win-body::-webkit-scrollbar-thumb:hover{ background:var(--faint); }
+
+  /* ============ TOP BAR ============ */
+  #topbar{
+    position:fixed; top:0; left:0; right:0; height:32px; z-index:900;
+    background:rgba(16,18,23,0.55); backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border-bottom:1px solid var(--glass-border);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 16px; font-size:11.5px; color:var(--muted);
+    box-shadow:0 1px 0 rgba(255,255,255,0.02);
+  }
+  #topbar .left{ display:flex; align-items:center; gap:7px; color:var(--text); font-weight:600; letter-spacing:0.01em; }
+  #topbar .left .dot{ width:6px; height:6px; border-radius:50%; background:var(--crimson); box-shadow:0 0 8px 1px var(--crimson); animation:blip 2.4s ease-in-out infinite; }
+  @keyframes blip{ 0%,100%{ opacity:1; } 50%{ opacity:0.45; } }
+  #topbar .center{ letter-spacing:0.04em; color:var(--faint); }
+  #topbar .right{ display:flex; align-items:center; gap:18px; }
+  #topbar .sysicons{ display:flex; align-items:center; gap:11px; color:var(--faint); font-size:12px; }
+  #nowplaying{ display:flex; align-items:center; gap:7px; color:var(--muted); padding:3px 8px; border-radius:5px; transition:background 0.15s, color 0.15s; background:none; border:none; font-family:'JetBrains Mono', monospace; font-size:11.5px; cursor:pointer; }
+  #nowplaying:hover{ color:var(--plasma); background:rgba(243,236,217,0.06); }
+  #nowplaying .playicon{ font-size:10px; width:12px; text-align:center; }
+  #nowplaying .bars{ display:flex; align-items:flex-end; gap:1.5px; height:10px; }
+  #nowplaying .bars span{ width:2px; background:var(--faint); animation:none; }
+  #nowplaying.playing .bars span{ background:var(--crimson); animation:bar 1s ease-in-out infinite; }
+  #nowplaying .bars span:nth-child(1){ animation-delay:0s; height:4px; }
+  #nowplaying .bars span:nth-child(2){ animation-delay:0.2s; height:8px; }
+  #nowplaying .bars span:nth-child(3){ animation-delay:0.4s; height:5px; }
+  @keyframes bar{ 0%,100%{ transform:scaleY(0.4); } 50%{ transform:scaleY(1); } }
+
+  /* ============ DESKTOP ============ */
+  #desktop{
+    position:absolute; top:32px; left:0; right:0; bottom:56px;
+    padding:28px;
+    display:grid; grid-template-columns:repeat(auto-fill, 84px); grid-auto-rows:92px;
+    gap:6px; align-content:start;
+  }
+  /* glass HUD shelf behind the icon row so they read as one designed unit,
+     not loose icons scattered over the video */
+  #desktop::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:134px;
+    background:linear-gradient(180deg, rgba(10,8,5,0.6) 0%, rgba(10,8,5,0.42) 55%, rgba(10,8,5,0) 100%);
+    backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
+    border-bottom:1px solid var(--glass-border);
+    pointer-events:none;
+  }
+  .icon{
+    position:relative; width:84px; height:92px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    gap:9px; cursor:pointer; padding:10px 4px; border-radius:8px; text-align:center;
+    transition:background 0.15s, transform 0.15s;
+  }
+  .icon:hover{ background:rgba(255,255,255,0.06); transform:translateY(-1px); }
+  .icon:focus-visible{ background:rgba(255,255,255,0.07); }
+  .icon:active .glyph{ transform:scale(0.93); }
+  .icon .glyph{
+    position:relative;
+    width:42px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-size:19px; border:1px solid var(--crimson); background:rgba(12,10,7,0.72);
+    backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px);
+    box-shadow:0 6px 18px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    transition:transform 0.12s, box-shadow 0.15s;
+  }
+  /* soft glow lives on a separate layer and only animates opacity —
+     compositor-cheap, unlike animating box-shadow directly every frame */
+  .icon .glyph::before{
+    content:''; position:absolute; inset:-7px; border-radius:14px; z-index:-1;
+    background:radial-gradient(circle, rgba(201,162,39,0.55) 0%, rgba(201,162,39,0) 72%);
+    opacity:0.5; animation:iconGlow 3.4s ease-in-out infinite;
+    will-change:opacity;
+  }
+  /* PCB-chip corner ticks, echoing the circuit-board background */
+  .icon .glyph::after{
+    content:''; position:absolute; inset:0; border-radius:9px; pointer-events:none;
+    background-image:
+      linear-gradient(var(--crimson) 1.5px, transparent 1.5px), linear-gradient(90deg, var(--crimson) 1.5px, transparent 1.5px),
+      linear-gradient(var(--crimson) 1.5px, transparent 1.5px), linear-gradient(90deg, var(--crimson) 1.5px, transparent 1.5px);
+    background-repeat:no-repeat;
+    background-size:6px 6px;
+    background-position:top left, top left, bottom right, bottom right;
+    opacity:0.75;
+  }
+  @keyframes iconGlow{ 0%,100%{ opacity:0.35; } 50%{ opacity:0.75; } }
+  body.pre-boot .icon .glyph::before{ animation:none; opacity:0; }
+  .icon:hover .glyph{ box-shadow:0 8px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset; }
+  .icon:hover .glyph::before{ opacity:1; animation-play-state:paused; }
+  .icon .glyph.red{ color:var(--crimson); border-color:var(--crimson); }
+  .icon .glyph.cyan{ color:var(--plasma); border-color:var(--plasma-dim); }
+  .icon:hover .glyph.cyan::before{ background:radial-gradient(circle, rgba(243,236,217,0.55) 0%, rgba(243,236,217,0) 72%); }
+  .icon .glyph.ember{ color:var(--ember); border-color:rgba(194,112,61,0.55); }
+  .icon:hover .glyph.ember::before{ background:radial-gradient(circle, rgba(194,112,61,0.55) 0%, rgba(194,112,61,0) 72%); }
+  .icon .lbl{
+    font-size:10.5px; color:var(--text); line-height:1.25; letter-spacing:0.01em;
+    padding:2px 7px; border-radius:4px; background:rgba(10,8,5,0.55);
+    text-shadow:0 1px 3px rgba(0,0,0,0.8);
+  }
+
+  /* record disc icon (desktop, small) */
+  .disc-glyph{ position:relative; }
+  .disc-glyph svg{ width:100%; height:100%; transform-origin:50% 50%; }
+  .disc-svg{ animation:spinrecord 2.6s linear infinite; animation-play-state:paused; }
+  body.audio-playing .disc-svg{ animation-play-state:running; }
+  @keyframes spinrecord{ to{ transform:rotate(360deg); } }
+
+  /* ============ PLAYER WINDOW ============ */
+  .player-body{ display:flex; flex-direction:column; align-items:center; padding:28px 26px 24px; }
+  .platter-rig{ position:relative; width:190px; height:190px; margin-bottom:6px; }
+  .platter-rig .platter-svg{ width:100%; height:100%; transform-origin:50% 50%; filter:drop-shadow(0 14px 26px rgba(0,0,0,0.5)); }
+  .tonearm{
+    position:absolute; top:-8px; right:6px; width:70px; height:70px;
+    transform:rotate(-32deg); transform-origin:88% 12%;
+    transition:transform 0.5s cubic-bezier(.3,1,.4,1);
+  }
+  body.audio-playing .tonearm{ transform:rotate(-8deg); }
+  .track-title{ font-family:'Space Grotesk', sans-serif; font-size:1.05rem; color:var(--text); margin-top:14px; }
+  .track-artist{ font-size:11.5px; color:var(--faint); margin-top:2px; letter-spacing:0.02em; }
+  .player-controls{ display:flex; align-items:center; gap:14px; margin-top:20px; }
+  .playpause-big{
+    width:46px; height:46px; border-radius:50%; border:1px solid var(--crimson-dim);
+    background:rgba(201,162,39,0.08); color:var(--crimson); font-size:16px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:background 0.15s, transform 0.15s;
+  }
+  .playpause-big:hover{ background:rgba(201,162,39,0.16); transform:scale(1.05); }
+  .player-progress{ width:100%; margin-top:20px; }
+  .player-progress .bar{ width:100%; height:4px; border-radius:4px; background:var(--line); cursor:pointer; overflow:hidden; }
+  .player-progress .bar .fill{ height:100%; width:0%; background:var(--crimson); border-radius:4px; }
+  .player-times{ display:flex; justify-content:space-between; font-size:10.5px; color:var(--faint); margin-top:6px; }
+
+  /* ============ WINDOWS ============ */
+  .win{
+    position:absolute; width:min(560px, 90vw); min-height:200px; max-height:72vh;
+    background:var(--panel);
+    backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+    border:1px solid var(--glass-border); border-radius:12px;
+    box-shadow:var(--shadow-lg);
+    display:flex; flex-direction:column; overflow:hidden;
+    z-index:100;
+    animation:winIn 0.22s cubic-bezier(.2,.9,.3,1);
+    transform-origin:top left;
+  }
+  @keyframes winIn{ from{ opacity:0; transform:scale(0.96) translateY(6px); } to{ opacity:1; transform:scale(1) translateY(0); } }
+  .win.hidden{ display:none; }
+  .win-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 14px; background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0));
+    border-bottom:1px solid var(--glass-border);
+    cursor:grab; font-size:12px;
+  }
+  .win-head:active{ cursor:grabbing; }
+  .win-title{ display:flex; align-items:center; gap:9px; color:var(--text); letter-spacing:0.01em; }
+  .win-title .tdot{ width:7px; height:7px; border-radius:50%; box-shadow:0 0 6px currentColor; }
+  .win-controls{ display:flex; gap:7px; }
+  .win-controls button{
+    width:15px; height:15px; border-radius:50%; border:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.03); color:transparent; font-size:8px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:background 0.15s, color 0.15s;
+  }
+  .win-controls button:hover{ background:var(--crimson); color:#1a0a0b; border-color:var(--crimson); }
+  .win-body{ padding:22px 24px; overflow-y:auto; font-size:13px; color:var(--muted); line-height:1.75; background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.02)); }
+  .win-body h3{ color:var(--text); font-size:1.2rem; margin-bottom:11px; letter-spacing:-0.01em; }
+  .win-body h4{ color:var(--text); font-size:0.98rem; margin:18px 0 6px; letter-spacing:-0.005em; }
+  .win-body p{ margin-bottom:11px; }
+  .win-body .tag{ font-family:'JetBrains Mono', monospace; background:rgba(243,236,217,0.08); color:var(--plasma); padding:1px 5px; border-radius:3px; font-size:0.92em; }
+  .win-body ul{ list-style:none; margin-bottom:6px; }
+  .win-body li{ position:relative; padding-left:17px; margin-bottom:9px; }
+  .win-body li::before{ content:'▸'; position:absolute; left:0; color:var(--crimson); }
+  .meta-row{ font-size:11.5px; color:var(--faint); margin-bottom:4px; letter-spacing:0.01em; }
+  .chips{ display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 4px; }
+  .chip{ font-size:11px; background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); padding:6px 10px; border-radius:5px; color:var(--text); transition:border-color 0.15s, background 0.15s; }
+  .chip:hover{ border-color:var(--plasma-dim); background:rgba(243,236,217,0.05); }
+  .divider{ border:none; border-top:1px solid var(--glass-border); margin:18px 0; }
+  .btnlink{
+    display:inline-block; margin-top:10px; font-size:12px; color:var(--crimson);
+    border:1px solid var(--crimson-dim); padding:9px 16px; border-radius:6px;
+    transition:background 0.15s, transform 0.15s;
+  }
+  .btnlink:hover{ background:rgba(201,162,39,0.1); transform:translateY(-1px); }
+  .stat-row{ display:flex; gap:32px; margin:16px 0 20px; flex-wrap:wrap; }
+  .stat b{ display:block; font-family:'Space Grotesk', sans-serif; font-size:1.6rem; color:var(--crimson); text-shadow:0 0 20px rgba(201,162,39,0.35); }
+  .stat span{ font-size:10.5px; color:var(--faint); text-transform:uppercase; letter-spacing:0.05em; }
+
+  /* Terminal specific */
+  #win-terminal .win-body{ padding:16px 18px; font-size:12.5px; background:rgba(0,0,0,0.22); }
+  #term-log{ white-space:pre-wrap; color:var(--text); }
+  #term-log .cmdline{ color:var(--plasma); }
+  #term-log .out{ color:var(--muted); margin:2px 0 10px; }
+  .term-input-row{ display:flex; align-items:center; gap:7px; margin-top:8px; padding-top:10px; border-top:1px solid var(--glass-border); }
+  .term-input-row span{ color:var(--crimson); }
+  #term-input{
+    flex:1; background:transparent; border:none; color:var(--text);
+    font-family:'JetBrains Mono', monospace; font-size:12.5px; outline:none;
+    caret-color:var(--crimson);
+  }
+
+  /* ============ DOCK ============ */
+  #dock{
+    position:fixed; bottom:14px; left:50%; transform:translateX(-50%); z-index:800;
+    display:flex; gap:8px; padding:9px 13px; border-radius:16px;
+    background:rgba(18,21,26,0.55); border:1px solid var(--glass-border);
+    backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%);
+    box-shadow:var(--shadow-lg);
+  }
+  .dock-btn{
+    width:44px; height:44px; border-radius:11px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.03);
+    display:flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer;
+    color:var(--muted); transition:transform 0.16s cubic-bezier(.2,.9,.3,1), border-color 0.15s, color 0.15s, background 0.15s;
+    position:relative;
+  }
+  .dock-btn:hover{ transform:translateY(-7px) scale(1.05); color:var(--text); border-color:var(--crimson-dim); background:rgba(255,255,255,0.06); }
+  .dock-btn:active{ transform:translateY(-3px) scale(0.97); }
+  .dock-btn.active{ color:var(--crimson); border-color:var(--crimson-dim); }
+  .dock-btn.active::after{
+    content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+    width:4px; height:4px; border-radius:50%; background:var(--crimson); box-shadow:0 0 6px var(--crimson);
+  }
+
+  /* ============ PIXEL GRASSLAND WIDGET ============ */
+  #terrarium{
+    position:fixed; right:22px; bottom:78px; z-index:600;
+    width:236px; height:132px; border-radius:10px; overflow:hidden;
+    border:1px solid var(--glass-border); box-shadow:var(--shadow-lg);
+    background:#1B1F26;
+  }
+  #terrarium svg{ width:100%; height:100%; display:block; image-rendering:pixelated; shape-rendering:crispEdges; }
+  #terrarium .tt-label{
+    position:absolute; top:6px; left:8px; font-size:9px; letter-spacing:0.06em; color:rgba(255,255,255,0.55);
+    text-shadow:0 1px 2px rgba(0,0,0,0.6); pointer-events:none; text-transform:uppercase;
+  }
+  .cloud{ animation:drift 26s linear infinite; }
+  .cloud.c2{ animation-duration:34s; animation-delay:-10s; }
+  @keyframes drift{ 0%{ transform:translateX(-20px); } 100%{ transform:translateX(256px); } }
+
+  .pdog{ cursor:pointer; }
+  .pdog-golden{ animation:trotL 5.2s steps(1) infinite alternate; }
+  .pdog-robot{ animation:trotR 6.4s steps(1) infinite alternate; animation-delay:-2s; }
+  @keyframes trotL{
+    0%   { transform:translateX(14px) scaleX(1); }
+    48%  { transform:translateX(150px) scaleX(1); }
+    50%  { transform:translateX(150px) scaleX(-1); }
+    98%  { transform:translateX(14px) scaleX(-1); }
+    100% { transform:translateX(14px) scaleX(1); }
+  }
+  @keyframes trotR{
+    0%   { transform:translateX(160px) scaleX(-1); }
+    48%  { transform:translateX(30px) scaleX(-1); }
+    50%  { transform:translateX(30px) scaleX(1); }
+    98%  { transform:translateX(160px) scaleX(1); }
+    100% { transform:translateX(160px) scaleX(-1); }
+  }
+  .pdog.paused{ animation-play-state:paused; }
+  .pdog .pleg{ animation:pstep 0.5s steps(2) infinite; transform-origin:top; }
+  .pdog.paused .pleg{ animation-play-state:paused; }
+  @keyframes pstep{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(1.5px);} }
+  .pdog .ptail{ transform-origin:right center; }
+  .pdog.wiggle .ptail{ animation:pwag 0.18s steps(2) infinite; }
+  @keyframes pwag{ 0%,100%{ transform:rotate(-16deg);} 50%{ transform:rotate(18deg);} }
+  .pdog .pbubble{ opacity:0; transition:opacity 0.15s; }
+  .pdog.wiggle .pbubble{ opacity:1; }
+
+  @media (max-width:640px){
+    #desktop{ grid-template-columns:repeat(auto-fill, 74px); grid-auto-rows:80px; }
+    .icon{ width:74px; }
+    .win{ width:92vw !important; left:4vw !important; top:70px !important; max-height:70vh; }
+    #topbar .center{ display:none; }
+    #terrarium{ right:12px; bottom:76px; width:168px; height:100px; }
+  }
+
+  /* ============ CINEMATIC GATE INTRO ============ */
+  #intro{ position:fixed; inset:0; z-index:2000; }
+  #intro.done{ display:none; }
+
+  .gate-panel{ position:fixed; left:0; width:100%; height:50%; overflow:hidden; z-index:30; transition:transform 0.9s cubic-bezier(.7,0,.15,1); }
+  #gate-top{ top:0; }
+  #gate-bottom{ top:50%; }
+  .gate-inner{
+    position:absolute; left:0; width:100%; height:100vh;
+    background:
+      radial-gradient(ellipse 900px 600px at 50% 50%, rgba(201,162,39,0.10), transparent 65%),
+      linear-gradient(160deg, #1B160E 0%, #0C0A06 60%, #0A0805 100%);
+  }
+  #gate-top .gate-inner{ top:0; }
+  #gate-bottom .gate-inner{ top:-50vh; }
+  .gate-frame{
+    position:absolute; left:18px; right:18px; top:18px; bottom:18px; pointer-events:none;
+    border-left:1px solid var(--crimson-dim); border-right:1px solid var(--crimson-dim);
+  }
+  /* only border the TRUE outer edge of the screen — never the seam where the
+     two panels meet, or the frame line ends up sitting right on the text */
+  #gate-top .gate-frame{ border-top:1px solid var(--crimson-dim); border-bottom:none; }
+  #gate-bottom .gate-frame{ border-bottom:1px solid var(--crimson-dim); border-top:none; }
+
+  .gate-frame::before, .gate-frame::after{
+    content:''; position:absolute; width:14px; height:14px; border:1px solid var(--crimson);
+  }
+  /* corner brackets only at the real screen corners — top panel decorates its
+     top-left/top-right, bottom panel decorates its bottom-left/bottom-right */
+  #gate-top .gate-frame::before{ top:-1px; left:-1px; border-right:none; border-bottom:none; }
+  #gate-top .gate-frame::after{ top:-1px; right:-1px; border-left:none; border-bottom:none; }
+  #gate-bottom .gate-frame::before{ bottom:-1px; left:-1px; border-right:none; border-top:none; }
+  #gate-bottom .gate-frame::after{ bottom:-1px; right:-1px; border-left:none; border-top:none; }
+  .gate-lotus{ position:absolute; left:50%; transform:translateX(-50%); opacity:0.7; }
+  #gate-top .gate-lotus{ top:38px; }
+  #gate-bottom .gate-lotus{ bottom:38px; }
+  .gate-text-inner{
+    position:absolute; top:50vh; left:50%; transform:translate(-50%,-50%);
+    font-family:'Space Grotesk', sans-serif; font-size:clamp(1.7rem, 5.4vw, 3.6rem); font-weight:700;
+    letter-spacing:0.07em; color:transparent; -webkit-text-stroke:1px var(--crimson-dim);
+    white-space:nowrap; transition:color 0.7s ease, -webkit-text-stroke 0.7s ease, text-shadow 0.7s ease;
+  }
+  #intro.lit .gate-text-inner{ color:var(--crimson); -webkit-text-stroke:1px var(--crimson); text-shadow:0 0 40px rgba(201,162,39,0.65), 0 0 90px rgba(201,162,39,0.35); }
+  .gate-hint{
+    position:fixed; bottom:64px; left:50%; transform:translateX(-50%); z-index:31;
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.15em; color:var(--faint);
+    animation:hintpulse 1.8s ease-in-out infinite; text-transform:uppercase;
+  }
+  #intro.lit .gate-hint, #intro.cracked .gate-hint, #intro.open .gate-hint{ opacity:0; }
+  @keyframes hintpulse{ 0%,100%{ opacity:0.4; } 50%{ opacity:1; } }
+
+  #intro.cracked #gate-top{ transform:translateY(-7px); }
+  #intro.cracked #gate-bottom{ transform:translateY(7px); }
+  #intro.open #gate-top{ transform:translateY(-100%); }
+  #intro.open #gate-bottom{ transform:translateY(100%); }
+
+  .gate-eyes{
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:20;
+    display:flex; gap:22px; opacity:0; transition:opacity 0.25s ease;
+  }
+  #intro.cracked .gate-eyes{ opacity:1; }
+  #intro.open .gate-eyes{ opacity:0; transition:opacity 0.3s ease; }
+  .gate-eyes .eye{
+    width:20px; height:7px; border-radius:50%;
+    background:radial-gradient(circle, #FBF3DD 0%, var(--crimson) 70%, transparent 100%);
+    box-shadow:0 0 14px 3px rgba(201,162,39,0.8);
+    animation:eyeblink 2.4s ease-in-out infinite;
+  }
+  @keyframes eyeblink{ 0%,88%,100%{ transform:scaleY(1); } 92%{ transform:scaleY(0.15); } }
+
+  .guardian-wrap{
+    position:fixed; inset:0; z-index:10; display:flex; align-items:center; justify-content:center;
+    transition:transform 1.1s cubic-bezier(.2,.8,.25,1);
+    transform:scale(1.14);
+  }
+  #intro.open .guardian-wrap{ transform:scale(1); }
+  .guardian-wrap svg{ width:min(46vh, 360px); height:auto; filter:drop-shadow(0 0 60px rgba(201,162,39,0.35)); }
+
+  /* the closed-gate scene (doors, frame, eyes, hint) sits noticeably closer
+     to the viewer — scaled up as one unit so nothing needs repositioning
+     individually. z-index sits above the guardian (10) but below the
+     matter canvas / flash (37/60) so stacking order is unchanged. */
+  .gate-scale-wrap{
+    position:fixed; inset:0; z-index:25;
+    transform:scale(1.25); transform-origin:50% 50%;
+    transition:transform 1s cubic-bezier(.3,0,.15,1);
+  }
+  /* once the text has lit up, push in toward center right as the crack
+     opens — the eyes land dead-center in frame at the moment they appear */
+  #intro.cracked .gate-scale-wrap{ transform:scale(4.5); }
+
+  /* condensing matter, charge, and blast are all drawn on one canvas now —
+     plain 2D shapes, no CSS filter/blend-mode/backdrop layering. Far cheaper
+     than stacking several filtered/blended DOM elements. */
+  #matter-canvas{
+    position:fixed; inset:0; z-index:37; pointer-events:none; opacity:0;
+    transition:opacity 0.25s ease;
+  }
+  #intro.arm-in #matter-canvas, #intro.grab #matter-canvas, #intro.throw #matter-canvas{ opacity:1; }
+  #intro.flash #matter-canvas{ opacity:0; }
+
+  .intro-flash{
+    position:fixed; inset:0; z-index:60; pointer-events:none; opacity:0;
+    background:radial-gradient(circle at 50% 55%, #FBF6E6 0%, var(--crimson) 55%, #1a1409 100%);
+    transition:opacity 0.18s ease;
+  }
+  #intro.flash .intro-flash{ opacity:1; }
+  #intro.fadeout .intro-flash{ opacity:0; transition:opacity 0.6s ease; }
+
+  body.pre-boot > *:not(#intro){ opacity:0; }
+  body:not(.pre-boot) > *:not(#intro){ transition:opacity 0.6s ease; opacity:1; }
+
+  /* ============ BRAHM 3D MODEL ============ */
+  #brahm3d{
+    position:fixed; inset:0; z-index:11; pointer-events:none;
+    opacity:0; transition:opacity .7s ease, transform 1.1s cubic-bezier(.2,.8,.25,1);
+    transform:scale(1.08);
+  }
+  #brahm3d canvas{ width:100%; height:100%; display:block; }
+  #intro.open #brahm3d{ opacity:1; transform:scale(1); }
+  #intro.cracked #brahm3d{ opacity:.72; }
+  #intro.flash #brahm3d{ opacity:0; transition:opacity .16s ease; }
+  .model-status{
+    position:fixed; left:50%; bottom:18%; transform:translateX(-50%);
+    z-index:35; font-size:10px; letter-spacing:.16em; color:var(--faint);
+    text-transform:uppercase; opacity:.75; pointer-events:none;
+  }
+  #intro.model-ready .model-status{ display:none; }
+
+  .brahmshilp-card{
+    margin:12px 0 18px; padding:12px; border:1px solid var(--glass-border);
+    border-radius:8px; background:rgba(0,0,0,.18);
+  }
+  .brahmshilp-card .model-badge{
+    display:inline-block; font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--crimson); border:1px solid var(--crimson-dim); padding:4px 7px; border-radius:4px;
+    margin-bottom:8px;
+  }
+  .brahmshilp-card strong{ color:var(--text); }
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body class="pre-boot">
+
+<video id="desktop-bg" muted loop playsinline preload="auto">
+  <source src="bg.mp4" type="video/mp4">
+</video>
+<div id="desktop-bg-tint"></div>
+
+
+<div id="intro">
+  <div class="guardian-wrap">
+    <div id="brahm3d" aria-label="Interactive 3D BrahmShilp character">
+      <canvas id="brahm-canvas"></canvas>
+    </div>
+    <div class="model-status" id="model-status">initializing 3d asset...</div>
+  </div>
+
+  <div class="gate-scale-wrap">
+    <div class="gate-eyes"><div class="eye"></div><div class="eye"></div></div>
+
+    <div class="gate-panel" id="gate-top">
+      <div class="gate-inner"><div class="gate-text-inner">Welcome Traveller</div></div>
+      <div class="gate-frame"></div>
+      <div class="gate-lotus">✿</div>
+    </div>
+    <div class="gate-panel" id="gate-bottom">
+      <div class="gate-inner"><div class="gate-text-inner">Welcome Traveller</div></div>
+      <div class="gate-frame"></div>
+      <div class="gate-lotus">✿</div>
+    </div>
+
+    <div class="gate-hint" id="gate-hint">click to enter</div>
+  </div>
+
+  <canvas id="matter-canvas"></canvas>
+
+  <div class="intro-flash"></div>
+</div>
+
+<div id="topbar">
+  <div class="left"><span class="dot"></span> brahm-os</div>
+  <div class="center" id="clock">00:00</div>
+  <div class="right">
+    <button id="nowplaying" type="button" aria-pressed="false" title="Play New Divide">
+      <span class="playicon">▶</span>
+      <span class="bars"><span></span><span></span><span></span></span>
+      New Divide — Linkin Park
+    </button>
+    <audio id="bgm" src="new-divide.mp3" preload="metadata" loop></audio>
+    <div class="sysicons"><span>◉</span><span>▮▮</span><span>100%</span></div>
+  </div>
+</div>
+
+<div id="desktop">
+  <div class="icon" data-open="about" tabindex="0"><div class="glyph red">◎</div><div class="lbl">About.txt</div></div>
+  <div class="icon" data-open="resume" tabindex="0"><div class="glyph cyan">▤</div><div class="lbl">Resume.pdf</div></div>
+  <div class="icon" data-open="research" tabindex="0"><div class="glyph cyan">▣</div><div class="lbl">Research/</div></div>
+  <div class="icon" data-open="brahm" tabindex="0"><div class="glyph red">◈</div><div class="lbl">BRAHM/</div></div>
+  <div class="icon" data-open="brahmshilp" tabindex="0"><div class="glyph ember">✺</div><div class="lbl">Brahmshilp/</div></div>
+  <div class="icon" data-open="skills" tabindex="0"><div class="glyph cyan">$</div><div class="lbl">skills.sh</div></div>
+  <div class="icon" data-open="terminal" tabindex="0"><div class="glyph red">▶</div><div class="lbl">Terminal</div></div>
+  <div class="icon" data-open="contact" tabindex="0"><div class="glyph ember">✉</div><div class="lbl">Contact.app</div></div>
+</div>
+
+<!-- PIXEL GRASSLAND WIDGET -->
+<div id="terrarium" title="Brahmshilp's yard">
+  <span class="tt-label">yard.exe</span>
+  <svg viewBox="0 0 176 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- sky -->
+    <rect x="0" y="0" width="176" height="20" fill="#12131c"/>
+    <rect x="0" y="20" width="176" height="20" fill="#2b1830"/>
+    <rect x="0" y="40" width="176" height="24" fill="#5c2430"/>
+    <!-- sun -->
+    <rect x="140" y="44" width="10" height="10" fill="#C2703D"/>
+    <rect x="138" y="46" width="14" height="6" fill="#C2703D" opacity="0.5"/>
+    <!-- clouds -->
+    <g class="cloud" fill="#E7E9EC" opacity="0.55">
+      <rect x="10" y="12" width="10" height="3"/><rect x="13" y="9" width="8" height="3"/>
+    </g>
+    <g class="cloud c2" fill="#E7E9EC" opacity="0.4">
+      <rect x="60" y="24" width="12" height="3"/><rect x="64" y="21" width="7" height="3"/>
+    </g>
+    <!-- ground -->
+    <rect x="0" y="64" width="176" height="36" fill="#132b19"/>
+    <g fill="#22461f" opacity="0.85">
+      <rect x="6" y="70" width="4" height="2"/><rect x="30" y="76" width="4" height="2"/>
+      <rect x="58" y="68" width="4" height="2"/><rect x="90" y="80" width="4" height="2"/>
+      <rect x="120" y="72" width="4" height="2"/><rect x="150" y="84" width="4" height="2"/>
+      <rect x="20" y="90" width="4" height="2"/><rect x="105" y="92" width="4" height="2"/>
+    </g>
+    <g fill="#3f7a45" opacity="0.7">
+      <rect x="16" y="66" width="2" height="2"/><rect x="46" y="82" width="2" height="2"/>
+      <rect x="78" y="72" width="2" height="2"/><rect x="112" y="88" width="2" height="2"/>
+      <rect x="140" y="70" width="2" height="2"/><rect x="165" y="90" width="2" height="2"/>
+    </g>
+
+    <!-- golden retriever -->
+    <g class="pdog pdog-golden" tabindex="0">
+      <g class="pbubble">
+        <rect x="2" y="52" width="20" height="9" fill="#20242C" stroke="#2C3138" stroke-width="0.5"/>
+        <text x="12" y="58.5" font-size="5" fill="#E7E9EC" text-anchor="middle" font-family="'JetBrains Mono',monospace">wag!</text>
+      </g>
+      <rect class="ptail" x="-3" y="69" width="4" height="2" fill="#B8863A"/>
+      <rect x="0" y="70" width="14" height="6" fill="#D4A24C"/>
+      <rect x="12" y="66" width="6" height="6" fill="#D4A24C"/>
+      <rect x="16" y="65" width="3" height="2" fill="#B8863A"/>
+      <rect x="18" y="69" width="2" height="2" fill="#3a2a12"/>
+      <rect class="pleg" x="2" y="76" width="2" height="4" fill="#B8863A"/>
+      <rect class="pleg" x="10" y="76" width="2" height="4" fill="#B8863A"/>
+    </g>
+
+    <!-- machine dog -->
+    <g class="pdog pdog-robot" tabindex="0">
+      <g class="pbubble">
+        <rect x="2" y="52" width="20" height="9" fill="#20242C" stroke="#2C3138" stroke-width="0.5"/>
+        <text x="12" y="58.5" font-size="5" fill="#F3ECD9" text-anchor="middle" font-family="'JetBrains Mono',monospace">beep</text>
+      </g>
+      <rect class="ptail" x="-3" y="69" width="4" height="2" fill="#F3ECD9"/>
+      <rect x="0" y="70" width="14" height="6" fill="#3A3F47"/>
+      <rect x="12" y="66" width="6" height="6" fill="#3A3F47"/>
+      <rect x="16" y="68" width="2" height="2" fill="#F3ECD9"/>
+      <rect x="17" y="63" width="1" height="3" fill="#F3ECD9"/>
+      <rect x="16.5" y="61" width="2" height="2" fill="#C2703D"/>
+      <rect class="pleg" x="2" y="76" width="2" height="4" fill="#20242C"/>
+      <rect class="pleg" x="10" y="76" width="2" height="4" fill="#20242C"/>
+    </g>
+  </svg>
+</div>
+
+<!-- DOCK -->
+<div id="dock">
+  <div class="dock-btn" data-open="research" title="Research">▣</div>
+  <div class="dock-btn" data-open="brahm" title="BRAHM">◈</div>
+  <div class="dock-btn" data-open="brahmshilp" title="Brahmshilp">✺</div>
+  <div class="dock-btn" data-open="skills" title="Skills">$</div>
+  <div class="dock-btn" data-open="terminal" title="Terminal">▶</div>
+  <div class="dock-btn" data-open="contact" title="Contact">✉</div>
+</div>
+
+<!-- ============ WINDOWS ============ -->
+
+<div class="win" id="win-about" style="top:70px; left:8%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--crimson)"></span>about.txt</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h3>Shardul Khanduri</h3>
+    <p class="meta-row">Delhi, India · shardulkhanduriphy@gmail.com · github.com/Shardul-collab</p>
+    <p>Condensed-matter researcher who fabricates gas-sensing thin films by hand, and an engineer building multi-agent AI systems to automate the science around them. This site is the bridge between those two things — one lab, one terminal.</p>
+    <p style="color:var(--faint); font-size:11.5px;">tip: open <span class="tag">Terminal</span> and try <span class="tag">whoami</span></p>
+  </div>
+</div>
+
+<div class="win" id="win-resume" style="top:90px; left:12%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--plasma)"></span>Resume.pdf</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h4>Education</h4>
+    <p><strong>M.Sc. Physics</strong> — NSUT, Delhi (2023–2025)<br>
+    <span style="color:var(--faint); font-size:11.5px;">Dissertation: ZnSe Thin Films for NO₂ Gas-Sensing Applications, CSIR-NPL</span></p>
+    <p><strong>B.Sc. Physics</strong> — HNBGU (2020–2023)</p>
+    <hr class="divider">
+    <h4>Certifications</h4>
+    <ul>
+      <li>DFT using Quantum ESPRESSO — CACR</li>
+      <li>DFT Modelling using Gaussian — CACR</li>
+      <li>Agentic AI Architecture Workshop — Outskill</li>
+      <li>Quantum Key Distribution (QKD) Workshop — NSUT</li>
+      <li>The Complete AI Guide — Udemy (41 hrs)</li>
+    </ul>
+    <a class="btnlink" href="mailto:shardulkhanduriphy@gmail.com?subject=Requesting%20full%20resume">Email me for the full PDF ↗</a>
+  </div>
+</div>
+
+<div class="win" id="win-research" style="top:80px; left:20%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--plasma)"></span>Research/</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h4>Master's Thesis Researcher — CSIR-NPL <span style="color:var(--faint); font-weight:400;">Jan–Jun 2025</span></h4>
+    <ul>
+      <li>Designed and executed a full thin-film fabrication pipeline: ZnSe via thermal vacuum deposition, Au contacts via RF magnetron sputtering.</li>
+      <li>Structure-property correlation using XRD, FESEM, EDX, UV-Vis — linking morphology to optical band-gap behavior.</li>
+      <li>Commissioned a custom NO₂ gas-sensing setup that generated the dissertation's core dataset.</li>
+    </ul>
+    <h4>Summer Research Intern — CSIR-NPL <span style="color:var(--faint); font-weight:400;">May–Jun 2024</span></h4>
+    <ul>
+      <li>DC reactive magnetron sputtering of SnO₂ films, tuning Ar/O₂ ratios for stoichiometry control.</li>
+      <li>Results informed the materials system chosen for the M.Sc. dissertation.</li>
+    </ul>
+    <h4>Technical Head — The Feynman Culture <span style="color:var(--faint); font-weight:400;">Jan 2024–May 2025</span></h4>
+    <ul>
+      <li>Led a 10-member technical team; delivered training on applying AI workflows to physics projects.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="win" id="win-brahm" style="top:100px; left:26%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--crimson)"></span>BRAHM/</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h3>BRAHM — Multi-Agent AI Research Ecosystem</h3>
+    <p class="meta-row">Solo Architect & Developer · 2025–Present</p>
+    <div class="stat-row">
+      <div class="stat"><b>5</b><span>Agents</span></div>
+      <div class="stat"><b>52+</b><span>Tools</span></div>
+      <div class="stat"><b>1</b><span>Engineer</span></div>
+    </div>
+    <ul>
+      <li>5-agent system automating literature retrieval, knowledge extraction, DFT orchestration, and report generation.</li>
+      <li>Retrieval backbone: RAG over FAISS, FastAPI microservices, SQLite — coordinated under Model Context Protocol (MCP).</li>
+      <li>Orchestration layer bridges natural-language queries to executable Quantum ESPRESSO DFT jobs.</li>
+      <li>Full-stack solo build: system design, agent logic, backend infra, RAG pipeline.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="win" id="win-brahmshilp" style="top:120px; left:16%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--ember)"></span>Brahmshilp/</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h3>Brahmshilp</h3>
+    <p class="meta-row">3D Character Lab · AI Assets · WebGL</p>
+    <div class="brahmshilp-card">
+      <span class="model-badge">live asset</span>
+      <p><strong>Cybernetic Trimurti</strong> — generated as a real 3D mesh and rendered in-browser with Three.js.</p>
+      <p style="margin-top:8px;color:var(--faint);font-size:11.5px;">Asset: Meshy-generated GLB · Meshopt-compressed · WebGL renderer</p>
+    </div>
+    <p>Brahmshilp is the visual layer of BRAHM: characters, environments, animation, and interactive research storytelling built as actual 3D assets rather than AI-generated video.</p>
+    <p>An AI-generated animated character I write, design, and edit myself — the public-facing voice for a private thesis: that research doesn't have to stay locked inside papers and labs. Each piece is built the same way BRAHM is: AI tools doing the heavy lifting, a human architect deciding what's worth saying.</p>
+    <p>Next layer: Blender rigging → procedural animation → MCP-controlled scene authoring → Three.js runtime.</p>
+    <a class="btnlink" href="https://www.instagram.com/brahmashilp/" target="_blank" rel="noopener">@ instagram — Brahmshilp ↗</a>
+  </div>
+</div>
+
+<div class="win" id="win-skills" style="top:110px; left:24%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--plasma)"></span>skills.sh</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h4>Programming & AI</h4>
+    <div class="chips">
+      <span class="chip">Python</span><span class="chip">C</span><span class="chip">Bash</span><span class="chip">Git</span>
+      <span class="chip">FastAPI</span><span class="chip">SQLite</span><span class="chip">MCP</span>
+      <span class="chip">Multi-Agent Systems</span><span class="chip">FAISS</span><span class="chip">RAG</span>
+    </div>
+    <h4>Materials Fabrication</h4>
+    <div class="chips">
+      <span class="chip">Thermal Vacuum Deposition</span><span class="chip">DC Reactive Sputtering</span>
+      <span class="chip">RF Magnetron Sputtering</span><span class="chip">High-Vacuum Systems</span>
+    </div>
+    <h4>Characterization</h4>
+    <div class="chips">
+      <span class="chip">XRD</span><span class="chip">FESEM</span><span class="chip">EDX</span>
+      <span class="chip">UV-Vis</span><span class="chip">NO₂ Gas Sensing</span>
+    </div>
+    <h4>Computational Tools</h4>
+    <div class="chips">
+      <span class="chip">Quantum ESPRESSO</span><span class="chip">Gaussian</span><span class="chip">VESTA</span>
+      <span class="chip">MATLAB</span><span class="chip">TINA-TI</span>
+    </div>
+  </div>
+</div>
+
+<div class="win" id="win-terminal" style="top:130px; left:30%; width:min(520px,90vw);">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--crimson)"></span>shardul@brahm: ~</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <div id="term-log">Type <span class="tag">help</span> to see available commands.
+</div>
+    <div class="term-input-row">
+      <span>shardul@brahm:~$</span>
+      <input id="term-input" type="text" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+</div>
+
+<div class="win" id="win-player" style="top:46px; right:22px; width:236px;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--crimson)"></span>music.exe</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body player-body">
+    <div class="platter-rig">
+      <svg class="platter-svg disc-svg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="47" fill="#0C0D10" stroke="#2C3138" stroke-width="1"/>
+        <circle cx="50" cy="50" r="38" fill="none" stroke="#1c1f24" stroke-width="1"/>
+        <circle cx="50" cy="50" r="30" fill="none" stroke="#1c1f24" stroke-width="1"/>
+        <circle cx="50" cy="50" r="22" fill="none" stroke="#1c1f24" stroke-width="1"/>
+        <circle cx="50" cy="50" r="15" fill="#C9A227"/>
+        <text x="50" y="48" text-anchor="middle" font-size="4.2" fill="#1a0b0c" font-family="'Space Grotesk',sans-serif" font-weight="700">LINKIN PARK</text>
+        <text x="50" y="55" text-anchor="middle" font-size="3.4" fill="#1a0b0c" font-family="'JetBrains Mono',monospace">NEW DIVIDE</text>
+        <circle cx="50" cy="50" r="2.4" fill="#0C0D10"/>
+      </svg>
+      <svg class="tonearm" viewBox="0 0 70 70">
+        <circle cx="60" cy="10" r="6" fill="#20242C" stroke="var(--glass-border)"/>
+        <line x1="60" y1="10" x2="18" y2="52" stroke="#3a4048" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="18" cy="52" r="3" fill="var(--crimson)"/>
+      </svg>
+    </div>
+    <div class="track-title">New Divide</div>
+    <div class="track-artist">Linkin Park</div>
+    <div class="player-controls">
+      <button class="playpause-big" id="player-toggle" aria-pressed="false" title="Play/Pause">▶</button>
+    </div>
+    <div class="player-progress">
+      <div class="bar" id="player-bar"><div class="fill" id="player-fill"></div></div>
+      <div class="player-times"><span id="player-current">0:00</span><span id="player-duration">0:00</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="win" id="win-contact" style="top:150px; left:34%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--ember)"></span>Contact.app</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h3>Let's talk research, systems, or both.</h3>
+    <p>Open to research collaborations, DFT/agentic-AI tooling discussions, and anything at the edge of the two.</p>
+    <p><a href="mailto:shardulkhanduriphy@gmail.com">shardulkhanduriphy@gmail.com</a></p>
+    <p><a href="https://github.com/Shardul-collab" target="_blank" rel="noopener">github.com/Shardul-collab</a></p>
+    <p><a href="tel:+918445031524">+91 84450 31524</a></p>
+  </div>
+</div>
+
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+const canvas = document.getElementById('brahm-canvas');
+const intro = document.getElementById('intro');
+const status = document.getElementById('model-status');
+
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.01, 20);
+// Start tight on him (dramatic close-up as the gate cracks), then dolly back
+// to a distance that actually fits his full height in frame — at fov 28 the
+// old fixed distance (0.92) was too close to fit a 0.82-unit-tall figure at all.
+const camCloseZ = 0.62, camCloseLookY = 0.62;
+const camRestZ = 2.35, camRestLookY = 0.40;
+let camZ = camCloseZ;
+let camLookY = camCloseLookY;
+let camTargetZ = camCloseZ;
+let camTargetLookY = camCloseLookY;
+camera.position.set(0, 0.48, camZ);
+camera.lookAt(0, camLookY, 0);
+
+// Called from the intro sequence once the gates open, to trigger the pull-back.
+window.brahmRevealCamera = function(){
+  camTargetZ = camRestZ;
+  camTargetLookY = camRestLookY;
+};
+
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true,
+  alpha: true,
+  powerPreference: 'high-performance'
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const hemi = new THREE.HemisphereLight(0xfff4d6, 0x160f08, 1.8);
+scene.add(hemi);
+
+const key = new THREE.DirectionalLight(0xffe7ad, 3.4);
+key.position.set(2.5, 3.5, 3);
+scene.add(key);
+
+const rim = new THREE.PointLight(0xc9a227, 16, 4);
+rim.position.set(-1.4, 1.1, -1.2);
+scene.add(rim);
+
+const fill = new THREE.PointLight(0x9ec8ff, 7, 3);
+fill.position.set(1.5, 0.65, 1.8);
+scene.add(fill);
+
+const modelGroup = new THREE.Group();
+scene.add(modelGroup);
+
+let model = null;
+let baseY = 0;
+let targetRotY = 0;
+
+let resolveModelReady;
+window.brahmModelReady = new Promise((res) => { resolveModelReady = res; });
+
+const loader = new GLTFLoader();
+loader.setMeshoptDecoder(MeshoptDecoder);
+loader.load(
+  'brahmshilp-trimurti.glb',
+  (gltf) => {
+    model = gltf.scene;
+
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    model.position.sub(center);
+    model.position.y += size.y / 2;
+
+    // The exported asset is ~12 cm tall; scale it to a hero-sized browser object.
+    const desiredHeight = 0.82;
+    const scale = desiredHeight / size.y;
+    model.scale.setScalar(scale);
+
+    baseY = model.position.y;
+    modelGroup.add(model);
+
+    status.textContent = '';
+    intro.classList.add('model-ready');
+    resolveModelReady();
+  },
+  (progress) => {
+    if (progress.total) {
+      status.textContent = `loading 3d asset ${Math.round(progress.loaded / progress.total * 100)}%`;
+    }
+  },
+  (error) => {
+    console.error('BRAHM GLB failed to load:', error);
+    status.textContent = '3d asset unavailable — check the GLB path';
+    resolveModelReady();
+  }
+);
+
+function resize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+window.addEventListener('resize', resize);
+
+const clock3d = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock3d.getElapsedTime();
+
+  if (model) {
+    // Subtle breathing/float motion keeps the reveal alive without requiring a rig.
+    model.position.y = baseY + Math.sin(t * 1.15) * 0.006;
+    targetRotY = Math.sin(t * 0.28) * 0.12;
+    model.rotation.y += (targetRotY - model.rotation.y) * 0.035;
+  }
+
+  // Smooth camera dolly: pulls back from the tight entrance shot to the
+  // full-figure resting frame once brahmRevealCamera() has been triggered.
+  camZ += (camTargetZ - camZ) * 0.045;
+  camLookY += (camTargetLookY - camLookY) * 0.045;
+  camera.position.z = camZ;
+  camera.lookAt(0, camLookY, 0);
+
+  rim.intensity = 14 + Math.sin(t * 1.4) * 3;
+  fill.intensity = 6 + Math.sin(t * 0.8 + 1.5) * 1.2;
+
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+
+<script>
+// -------- Energy sequence: condensing matter -> charging orb -> blast --------
+// Everything here is drawn with plain canvas 2D shapes. No CSS filter,
+// mix-blend-mode, or backdrop-filter involved anywhere in this effect —
+// those were the actual cost, not the concept. A canvas is one bitmap the
+// GPU composites once per frame; three stacked, filtered/blended DOM layers
+// each force their own separate expensive repaint.
+const matterCanvas = document.getElementById('matter-canvas');
+const mctx = matterCanvas.getContext('2d');
+let energyParticles = [];
+let energyRAF = null;
+let energyStartTime = 0;
+let energyPhase = 'idle'; // 'converge' -> 'charge' -> 'blast'
+let energyConvergeMs = 900;
+let energyChargeMs = 900;
+let energyBlastMs = 550;
+const CX_RATIO = 0.5, CY_RATIO = 0.52;
+
+function resizeMatterCanvas(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  matterCanvas.width = window.innerWidth * dpr;
+  matterCanvas.height = window.innerHeight * dpr;
+  matterCanvas.style.width = window.innerWidth + 'px';
+  matterCanvas.style.height = window.innerHeight + 'px';
+  mctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize', resizeMatterCanvas);
+resizeMatterCanvas();
+
+function spawnEnergyParticles(){
+  const cx = window.innerWidth * CX_RATIO;
+  const cy = window.innerHeight * CY_RATIO;
+  const n = 26;
+  energyParticles = [];
+  for(let i=0;i<n;i++){
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 140 + Math.random() * (Math.min(window.innerWidth, window.innerHeight) * 0.4);
+    energyParticles.push({
+      sx: cx + Math.cos(angle) * dist,
+      sy: cy + Math.sin(angle) * dist,
+      cx, cy,
+      delay: Math.random() * 220,
+      dur: 300 + Math.random() * 220,
+      size: 1.2 + Math.random() * 2
+    });
+  }
+}
+
+function easeInQuad(t){ return t * t; }
+function easeOutQuad(t){ return t * (2 - t); }
+
+function drawParticles(elapsed){
+  mctx.globalCompositeOperation = 'lighter';
+  for(const p of energyParticles){
+    const local = elapsed - p.delay;
+    if(local <= 0) continue;
+    const t = Math.min(local / p.dur, 1);
+    const e = easeInQuad(t);
+    const x = p.sx + (p.cx - p.sx) * e;
+    const y = p.sy + (p.cy - p.sy) * e;
+    const alpha = t < 0.92 ? (0.25 + t * 0.75) : (1 - (t - 0.92) / 0.08);
+    mctx.beginPath();
+    mctx.arc(x, y, p.size, 0, Math.PI*2);
+    mctx.fillStyle = `rgba(251,246,230,${Math.max(alpha,0)})`;
+    mctx.fill();
+  }
+  mctx.globalCompositeOperation = 'source-over';
+}
+
+function drawGlowCircle(cx, cy, radius, coreAlpha, edgeAlpha){
+  const g = mctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+  g.addColorStop(0, `rgba(255,255,255,${coreAlpha})`);
+  g.addColorStop(0.35, `rgba(251,246,230,${coreAlpha * 0.75})`);
+  g.addColorStop(0.7, `rgba(201,162,39,${edgeAlpha})`);
+  g.addColorStop(1, 'rgba(201,162,39,0)');
+  mctx.fillStyle = g;
+  mctx.beginPath();
+  mctx.arc(cx, cy, radius, 0, Math.PI*2);
+  mctx.fill();
+}
+
+function stepEnergy(now){
+  if(!energyStartTime) energyStartTime = now;
+  const elapsed = now - energyStartTime;
+  const W = window.innerWidth, H = window.innerHeight;
+  const cx = W * CX_RATIO, cy = H * CY_RATIO;
+  mctx.clearRect(0, 0, W, H);
+
+  if(energyPhase === 'converge'){
+    drawParticles(elapsed);
+    if(elapsed >= energyConvergeMs){
+      energyPhase = 'charge';
+      energyStartTime = now;
+    }
+    energyRAF = requestAnimationFrame(stepEnergy);
+    return;
+  }
+
+  if(energyPhase === 'charge'){
+    const t = Math.min(elapsed / energyChargeMs, 1);
+    // fast, snappy pulse — a couple of breaths while charging, not a slow drift
+    const pulse = 1 + Math.sin(elapsed / 90) * 0.08 * t;
+    const radius = (10 + t * 22) * pulse;
+    drawGlowCircle(cx, cy, radius, 0.9, 0.55 + t * 0.3);
+    if(elapsed < energyChargeMs){
+      energyRAF = requestAnimationFrame(stepEnergy);
+    }
+    return;
+  }
+
+  if(energyPhase === 'blast'){
+    const t = Math.min(elapsed / energyBlastMs, 1);
+    const e = easeOutQuad(t);
+    const maxRadius = Math.hypot(W, H) * 0.62;
+    const radius = 22 + e * maxRadius;
+    const alpha = t < 0.7 ? 0.9 : 0.9 * (1 - (t - 0.7) / 0.3);
+    drawGlowCircle(cx, cy, radius, alpha, alpha * 0.6);
+    if(t < 1){
+      energyRAF = requestAnimationFrame(stepEnergy);
+    } else {
+      energyPhase = 'idle';
+    }
+    return;
+  }
+}
+
+// converge (matter gathering) immediately followed by charge (orb building) —
+// call once, right as the 'arm-in' stage begins.
+function startEnergySequence(convergeMs, chargeMs){
+  spawnEnergyParticles();
+  energyConvergeMs = convergeMs;
+  energyChargeMs = chargeMs;
+  energyPhase = 'converge';
+  energyStartTime = 0;
+  if(energyRAF) cancelAnimationFrame(energyRAF);
+  energyRAF = requestAnimationFrame(stepEnergy);
+}
+// release — expanding blast that fills the screen, then the flash takes over.
+function triggerBlast(blastMs){
+  energyBlastMs = blastMs;
+  energyPhase = 'blast';
+  energyStartTime = 0;
+  if(energyRAF) cancelAnimationFrame(energyRAF);
+  energyRAF = requestAnimationFrame(stepEnergy);
+}
+function stopEnergySequence(){
+  if(energyRAF) cancelAnimationFrame(energyRAF);
+  energyRAF = null;
+  energyPhase = 'idle';
+  mctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+}
+
+// -------- Cinematic gate intro --------
+const introEl = document.getElementById('intro');
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+let introRunning = false;
+
+async function runIntro(){
+  if(introRunning) return;
+  introRunning = true;
+  document.getElementById('gate-hint').style.display = 'none';
+
+  introEl.classList.add('lit');
+  await wait(1250);
+  introEl.classList.add('cracked');
+  // Give the GLB a real chance to finish loading before the gates open —
+  // otherwise the reveal can race ahead of the asset and the character
+  // never actually gets seen. Falls back to a max wait so a slow/failed
+  // load can't hang the intro forever.
+  await Promise.race([window.brahmModelReady, wait(5000)]);
+  await wait(800);
+  introEl.classList.add('open');
+  window.brahmRevealCamera && window.brahmRevealCamera();
+  await wait(1650);
+  introEl.classList.add('arm-in');
+  startEnergySequence(850, 850);
+  await wait(850);
+  introEl.classList.add('grab');
+  await wait(850);
+  introEl.classList.add('throw');
+  triggerBlast(550);
+  await wait(550);
+  introEl.classList.add('flash');
+  stopEnergySequence();
+  document.body.classList.remove('pre-boot');
+  const desktopBg = document.getElementById('desktop-bg');
+  desktopBg.play().catch(()=>{}); // start decoding only once the desktop is actually visible
+  openWin('player');
+  await wait(780);
+  introEl.classList.add('fadeout');
+  await wait(1150);
+  introEl.classList.add('done');
+}
+introEl.addEventListener('click', runIntro);
+
+// -------- Clock --------
+function tickClock(){
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2,'0');
+  const m = String(d.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}`;
+}
+tickClock(); setInterval(tickClock, 15000);
+
+// -------- Window manager --------
+let zTop = 100;
+const windows = {};
+document.querySelectorAll('.win').forEach(w=>{
+  const id = w.id.replace('win-','');
+  windows[id] = w;
+  w.classList.add('hidden');
+  w.style.zIndex = zTop;
+});
+
+function focusWin(w){
+  zTop += 1;
+  w.style.zIndex = zTop;
+  document.querySelectorAll('.dock-btn').forEach(b=>b.classList.remove('active'));
+  const id = w.id.replace('win-','');
+  document.querySelectorAll(`[data-open="${id}"]`).forEach(el=>el.classList && el.classList.add('active'));
+}
+
+function openWin(id){
+  const w = windows[id];
+  if(!w) return;
+  const isMobile = window.innerWidth < 640;
+  if(isMobile){ w.style.top = '70px'; w.style.left = '4vw'; }
+  w.classList.remove('hidden');
+  focusWin(w);
+}
+
+document.querySelectorAll('[data-open]').forEach(el=>{
+  el.addEventListener('click', ()=> openWin(el.dataset.open));
+  el.addEventListener('keydown', e=>{ if(e.key==='Enter') openWin(el.dataset.open); });
+});
+
+document.querySelectorAll('.win').forEach(w=>{
+  w.addEventListener('mousedown', ()=> focusWin(w));
+  w.querySelector('[data-close]').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    w.classList.add('hidden');
+  });
+});
+
+// -------- Dragging --------
+document.querySelectorAll('.win').forEach(w=>{
+  const handle = w.querySelector('[data-drag]');
+  let dragging=false, offX=0, offY=0;
+  handle.addEventListener('mousedown', (e)=>{
+    dragging = true;
+    const rect = w.getBoundingClientRect();
+    offX = e.clientX - rect.left;
+    offY = e.clientY - rect.top;
+    focusWin(w);
+  });
+  window.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    let x = e.clientX - offX;
+    let y = e.clientY - offY;
+    x = Math.max(4, Math.min(x, window.innerWidth - 60));
+    y = Math.max(34, Math.min(y, window.innerHeight - 40));
+    w.style.left = x + 'px';
+    w.style.top = y + 'px';
+  });
+  window.addEventListener('mouseup', ()=> dragging=false);
+
+  // touch support
+  handle.addEventListener('touchstart', (e)=>{
+    dragging = true;
+    const rect = w.getBoundingClientRect();
+    const t = e.touches[0];
+    offX = t.clientX - rect.left;
+    offY = t.clientY - rect.top;
+    focusWin(w);
+  }, {passive:true});
+  window.addEventListener('touchmove', (e)=>{
+    if(!dragging) return;
+    const t = e.touches[0];
+    let x = t.clientX - offX;
+    let y = t.clientY - offY;
+    x = Math.max(4, Math.min(x, window.innerWidth - 60));
+    y = Math.max(34, Math.min(y, window.innerHeight - 40));
+    w.style.left = x + 'px';
+    w.style.top = y + 'px';
+  }, {passive:true});
+  window.addEventListener('touchend', ()=> dragging=false);
+});
+
+// -------- Terminal --------
+const termLog = document.getElementById('term-log');
+const termInput = document.getElementById('term-input');
+const commands = {
+  help: "Available: whoami, skills, projects, brahmshilp, contact, clear",
+  whoami: "Shardul Khanduri — condensed-matter researcher & agentic-AI builder. Currently deciding whether the dog or the robot dog is the better metaphor for that.",
+  skills: "Python · FastAPI · RAG/FAISS · MCP · TVD · Sputtering · XRD/FESEM/EDX · Quantum ESPRESSO",
+  projects: "BRAHM — 5-agent AI research ecosystem, 52+ tools, RAG + DFT orchestration. Open the BRAHM/ window for details.",
+  brahmshilp: "Brahmshilp — the visual 3D layer of BRAHM: GLB assets, WebGL scenes, animation, and AI-assisted worldbuilding.",
+  contact: "shardulkhanduriphy@gmail.com · github.com/Shardul-collab · +91 84450 31524",
+  ls: "About.txt  Resume.pdf  Research/  BRAHM/  Brahmshilp/  skills.sh  Contact.app",
+  sudo: "Nice try. You already have full access — just click around.",
+};
+function printLine(cmd, out){
+  const c = document.createElement('div');
+  c.className = 'cmdline';
+  c.textContent = 'shardul@brahm:~$ ' + cmd;
+  const o = document.createElement('div');
+  o.className = 'out';
+  o.textContent = out;
+  termLog.appendChild(c);
+  termLog.appendChild(o);
+}
+termInput.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Enter') return;
+  const raw = termInput.value.trim();
+  const cmd = raw.toLowerCase();
+  termInput.value = '';
+  if(cmd === 'clear'){ termLog.innerHTML=''; return; }
+  const out = commands[cmd] || `command not found: ${raw}`;
+  printLine(raw, out);
+  termLog.parentElement.scrollTop = termLog.parentElement.scrollHeight;
+});
+
+// -------- Pixel dogs: click to wiggle & "look at screen" --------
+document.querySelectorAll('.pdog').forEach(dog=>{
+  dog.addEventListener('click', ()=>{
+    dog.classList.add('paused','wiggle');
+    setTimeout(()=> dog.classList.remove('paused','wiggle'), 1400);
+  });
+  dog.addEventListener('keydown', (e)=>{
+    if(e.key !== 'Enter') return;
+    dog.classList.add('paused','wiggle');
+    setTimeout(()=> dog.classList.remove('paused','wiggle'), 1400);
+  });
+});
+
+// -------- Audio player: New Divide, plays in-page --------
+const bgm = document.getElementById('bgm');
+const npBtn = document.getElementById('nowplaying');
+const playerToggle = document.getElementById('player-toggle');
+const playerBar = document.getElementById('player-bar');
+const playerFill = document.getElementById('player-fill');
+const playerCurrent = document.getElementById('player-current');
+const playerDuration = document.getElementById('player-duration');
+
+function fmtTime(s){
+  if(!isFinite(s)) return '0:00';
+  const m = Math.floor(s/60);
+  const sec = Math.floor(s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function setPlayingUI(isPlaying){
+  document.body.classList.toggle('audio-playing', isPlaying);
+  npBtn.classList.toggle('playing', isPlaying);
+  npBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+  npBtn.querySelector('.playicon').textContent = isPlaying ? '⏸' : '▶';
+  playerToggle.textContent = isPlaying ? '⏸' : '▶';
+  playerToggle.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+}
+
+async function toggleAudio(){
+  if(bgm.paused){
+    try{
+      await bgm.play();
+      setPlayingUI(true);
+    }catch(err){
+      npBtn.querySelector('.playicon').textContent = '⚠';
+      console.warn('Audio playback failed.', err);
+    }
+  } else {
+    bgm.pause();
+    setPlayingUI(false);
+  }
+}
+
+npBtn.addEventListener('click', toggleAudio);
+playerToggle.addEventListener('click', toggleAudio);
+bgm.addEventListener('ended', ()=> setPlayingUI(false));
+
+bgm.addEventListener('loadedmetadata', ()=>{ playerDuration.textContent = fmtTime(bgm.duration); });
+bgm.addEventListener('timeupdate', ()=>{
+  if(bgm.duration){
+    playerFill.style.width = (bgm.currentTime / bgm.duration * 100) + '%';
+    playerCurrent.textContent = fmtTime(bgm.currentTime);
+  }
+});
+playerBar.addEventListener('click', (e)=>{
+  const rect = playerBar.getBoundingClientRect();
+  const ratio = (e.clientX - rect.left) / rect.width;
+  if(bgm.duration) bgm.currentTime = ratio * bgm.duration;
+});
+</script>
+
+</body>
+</html>
