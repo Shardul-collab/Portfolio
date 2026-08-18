@@ -258,6 +258,37 @@
   /* Terminal specific */
   #win-terminal .win-body{ padding:16px 18px; font-size:12.5px; background:rgba(0,0,0,0.22); }
   #term-log{ white-space:pre-wrap; color:var(--text); }
+
+  /* ============ GAME: RubbleRun — shoot the falling debris ============ */
+  .game-body{ padding:18px 20px 20px; display:flex; flex-direction:column; align-items:center; }
+  .game-status{
+    display:flex; align-items:center; justify-content:space-between; width:100%;
+    margin-bottom:10px; font-size:12px; color:var(--muted);
+  }
+  .game-status .turn{ display:flex; align-items:center; gap:7px; color:var(--text); }
+  .game-status .turn b{ color:var(--crimson); font-family:'Space Grotesk', sans-serif; }
+  .game-reset{
+    font-size:11px; color:var(--faint); background:none; border:1px solid var(--glass-border);
+    padding:5px 10px; border-radius:5px; cursor:pointer; font-family:'JetBrains Mono', monospace;
+    transition:color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .game-reset:hover{ color:var(--text); border-color:var(--crimson-dim); background:rgba(201,162,39,0.08); }
+  .game-canvas-wrap{ position:relative; width:100%; }
+  #game-canvas{
+    width:100%; height:220px; display:block; touch-action:none;
+    background:radial-gradient(ellipse 220px 140px at 50% 0%, rgba(201,162,39,0.08), transparent 72%), #0B0906;
+    border:1px solid var(--glass-border); border-radius:8px; cursor:crosshair;
+  }
+  .game-overlay{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    background:rgba(10,8,5,0.74); border-radius:8px; backdrop-filter:blur(2px); text-align:center; padding:0 20px;
+  }
+  .game-overlay.hidden{ display:none; }
+  .game-overlay-title{ font-family:'Space Grotesk', sans-serif; font-size:1.15rem; color:var(--text); }
+  .game-overlay-sub{ font-size:11.5px; color:var(--faint); }
+  .game-msg{
+    margin-top:11px; font-size:11px; color:var(--faint); min-height:14px; text-align:center; letter-spacing:0.01em;
+  }
   #term-log .cmdline{ color:var(--plasma); }
   #term-log .out{ color:var(--muted); margin:2px 0 10px; }
   .term-input-row{ display:flex; align-items:center; gap:7px; margin-top:8px; padding-top:10px; border-top:1px solid var(--glass-border); }
@@ -431,7 +462,18 @@
   /* once the text has lit up, push in toward center right as the crack
      opens — the eyes land dead-center in frame at the moment they appear */
   #intro.cracked .gate-scale-wrap{ transform:scale(4.5); }
-
+   /* ============ BRAHM NETWORK BACKGROUND ============ */
+	#brahm-network-bg{
+		position:fixed;
+		inset:0;
+		width:100%;
+		height:100%;
+		z-index:5; /* must stay below .guardian-wrap (10), which holds #brahm3d */
+		pointer-events:none;
+		opacity:1;
+		transition:opacity 0.4s ease;
+		}
+	#intro.throw #brahm-network-bg, #intro.flash #brahm-network-bg{ opacity:0; }
   /* condensing matter, charge, and blast are all drawn on one canvas now —
      plain 2D shapes, no CSS filter/blend-mode/backdrop layering. Far cheaper
      than stacking several filtered/blended DOM elements. */
@@ -500,6 +542,8 @@
 
 
 <div id="intro">
+  <canvas id="brahm-network-bg"></canvas>
+  
   <div class="guardian-wrap">
     <div id="brahm3d" aria-label="Interactive 3D BrahmShilp character">
       <canvas id="brahm-canvas"></canvas>
@@ -533,12 +577,13 @@
   <div class="left"><span class="dot"></span> brahm-os</div>
   <div class="center" id="clock">00:00</div>
   <div class="right">
-    <button id="nowplaying" type="button" aria-pressed="false" title="Play New Divide">
+    <button id="nowplaying" type="button" aria-pressed="false" title="Play Intro">
       <span class="playicon">▶</span>
       <span class="bars"><span></span><span></span><span></span></span>
-      New Divide — Linkin Park
+      Intro — Shardul Khanduri
     </button>
-    <audio id="bgm" src="new-divide.mp3" preload="metadata" loop></audio>
+    <audio id="bgm" src="audio.mp3" preload="metadata" loop></audio>
+    <audio id="ambient-bgm" src="08 Knight day town.ogg" preload="auto" loop></audio>
     <div class="sysicons"><span>◉</span><span>▮▮</span><span>100%</span></div>
   </div>
 </div>
@@ -791,8 +836,8 @@
         <circle cx="50" cy="50" r="30" fill="none" stroke="#1c1f24" stroke-width="1"/>
         <circle cx="50" cy="50" r="22" fill="none" stroke="#1c1f24" stroke-width="1"/>
         <circle cx="50" cy="50" r="15" fill="#C9A227"/>
-        <text x="50" y="48" text-anchor="middle" font-size="4.2" fill="#1a0b0c" font-family="'Space Grotesk',sans-serif" font-weight="700">LINKIN PARK</text>
-        <text x="50" y="55" text-anchor="middle" font-size="3.4" fill="#1a0b0c" font-family="'JetBrains Mono',monospace">NEW DIVIDE</text>
+        <text x="50" y="48" text-anchor="middle" font-size="4.2" fill="#1a0b0c" font-family="'Space Grotesk',sans-serif" font-weight="700">SHARDUL KHANDURI</text>
+        <text x="50" y="55" text-anchor="middle" font-size="3.4" fill="#1a0b0c" font-family="'JetBrains Mono',monospace">INTRO</text>
         <circle cx="50" cy="50" r="2.4" fill="#0C0D10"/>
       </svg>
       <svg class="tonearm" viewBox="0 0 70 70">
@@ -801,8 +846,8 @@
         <circle cx="18" cy="52" r="3" fill="var(--crimson)"/>
       </svg>
     </div>
-    <div class="track-title">New Divide</div>
-    <div class="track-artist">Linkin Park</div>
+    <div class="track-title">Intro</div>
+    <div class="track-artist">Shardul Khanduri</div>
     <div class="player-controls">
       <button class="playpause-big" id="player-toggle" aria-pressed="false" title="Play/Pause">▶</button>
     </div>
@@ -810,6 +855,28 @@
       <div class="bar" id="player-bar"><div class="fill" id="player-fill"></div></div>
       <div class="player-times"><span id="player-current">0:00</span><span id="player-duration">0:00</span></div>
     </div>
+  </div>
+</div>
+
+<div class="win" id="win-game" style="top:190px; left:22px; width:340px;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--ember)"></span>RubbleRun.exe</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body game-body">
+    <div class="game-status">
+      <div class="turn">score <b id="game-score">0</b></div>
+      <div class="turn" id="game-lives">●●●</div>
+    </div>
+    <div class="game-canvas-wrap">
+      <canvas id="game-canvas"></canvas>
+      <div class="game-overlay" id="game-overlay">
+        <div class="game-overlay-title" id="game-overlay-title">Rubble Run</div>
+        <div class="game-overlay-sub" id="game-overlay-sub">shoot the falling debris before it lands</div>
+        <button class="game-reset" id="game-start-btn" type="button">▶ start</button>
+      </div>
+    </div>
+    <div class="game-msg">move mouse to aim · click / tap to fire</div>
   </div>
 </div>
 
@@ -1037,6 +1104,173 @@ function drawParticles(elapsed){
   }
   mctx.globalCompositeOperation = 'source-over';
 }
+/* Manhattan-routed traces: each is [[x,y], [bendX,bendY], [cx,cy]] with the
+   two segment lengths pre-computed, so pulses can be walked along the path
+   as one continuous distance rather than an angle/radius pair. This reads
+   as current running through PCB copper rather than particles in free flight. */
+function traceLength(segLens){ return segLens[0] + segLens[1]; }
+
+function pointAlongTrace(pts, segLens, total, t){
+  let d = t * total;
+  if(d <= segLens[0]){
+    const segT = segLens[0] ? d / segLens[0] : 0;
+    return [ pts[0][0] + (pts[1][0]-pts[0][0]) * segT, pts[0][1] + (pts[1][1]-pts[0][1]) * segT ];
+  }
+  d -= segLens[0];
+  const segT = segLens[1] ? Math.min(d / segLens[1], 1) : 0;
+  return [ pts[1][0] + (pts[2][0]-pts[1][0]) * segT, pts[1][1] + (pts[2][1]-pts[1][1]) * segT ];
+}
+
+const TRACE_TIERS = [
+  { width: 2.4, alpha: 0.20, weight: 0.12 },  // power rail — thick, brighter
+  { width: 1.4, alpha: 0.16, weight: 0.28 },  // bus line — medium
+  { width: 0.6, alpha: 0.12, weight: 0.60 }   // signal trace — thin, most common
+];
+function pickTier(){
+  const r = Math.random();
+  let acc = 0;
+  for(const tier of TRACE_TIERS){
+    acc += tier.weight;
+    if(r <= acc) return tier;
+  }
+  return TRACE_TIERS[TRACE_TIERS.length-1];
+}
+
+function makeTrace(sx, sy, ex, ey, pulseCount){
+  const horizFirst = Math.random() < 0.5;
+  const bend = horizFirst ? [ex, sy] : [sx, ey];
+  const pts = [[sx, sy], bend, [ex, ey]];
+  const segLens = [
+    Math.hypot(bend[0]-sx, bend[1]-sy),
+    Math.hypot(ex-bend[0], ey-bend[1])
+  ];
+  const tier = pickTier();
+  const pulses = [];
+  for(let i=0;i<pulseCount;i++){
+    pulses.push({
+      speed: 0.00018 + Math.random() * 0.00026,
+      phase: Math.random(),
+      size: (1 + tier.width * 0.35) + Math.random() * 1.1
+    });
+  }
+  return { pts, segLens, total: traceLength(segLens), pulses, width: tier.width, alpha: tier.alpha };
+}
+
+let circuitTraces = [];
+let heroRadius = 140;
+
+/* Every trace ends on a ring around the character rather than at dead-center —
+   keeps the routing visually orbiting/behind him instead of driving straight
+   across his silhouette, regardless of any transparency in the model canvas. */
+function ringPoint(cx, cy, angle, r){
+  return [ cx + Math.cos(angle) * r, cy + Math.sin(angle) * r ];
+}
+
+function buildCircuitTraces(){
+  const W = window.innerWidth, H = window.innerHeight;
+  const cx = W * 0.50, cy = H * 0.52;
+  heroRadius = Math.min(W, H) * 0.19;
+  circuitTraces = [];
+
+  /* one trace per agent "chip" — always a power rail, ending on the ring
+     at the same angle the chip already sits from center */
+  networkAgents.forEach(agent => {
+    const ax = W * agent.x, ay = H * agent.y;
+    const angle = Math.atan2(ay - cy, ax - cx);
+    const [ex, ey] = ringPoint(cx, cy, angle, heroRadius);
+    const trace = makeTrace(ax, ay, ex, ey, 3);
+    trace.width = TRACE_TIERS[0].width;
+    trace.alpha = TRACE_TIERS[0].alpha;
+    circuitTraces.push(trace);
+  });
+
+  /* dense field of ambient traces, spaced at even angles all the way around
+     so coverage is symmetric rather than clustered wherever Math.random()
+     happened to land */
+  const AMBIENT_COUNT = 64;
+  const startRadius = Math.hypot(W, H) * 0.55;
+  for(let i=0;i<AMBIENT_COUNT;i++){
+    const angle = (i / AMBIENT_COUNT) * Math.PI * 2 + (Math.random() - 0.5) * (Math.PI / AMBIENT_COUNT) * 0.6;
+    const [sx, sy] = ringPoint(cx, cy, angle, startRadius);
+    const [ex, ey] = ringPoint(cx, cy, angle, heroRadius);
+    circuitTraces.push(makeTrace(sx, sy, ex, ey, 2));
+  }
+}
+
+let networkActive = false;
+
+function drawNetwork(now){
+  if(!networkActive) return;
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  const cx = W * 0.50;
+  const cy = H * 0.52;
+
+  nctx.clearRect(0, 0, W, H);
+
+  /* soft ring glow around the character, not a full-center fill — keeps the
+     brightest part of the effect off of where the model actually stands */
+  const pulse = 1 + Math.sin(now * 0.003) * 0.12;
+  const glow = nctx.createRadialGradient(cx, cy, heroRadius * 0.7, cx, cy, heroRadius * 1.6 * pulse);
+  glow.addColorStop(0, 'rgba(201,162,39,0)');
+  glow.addColorStop(0.55, 'rgba(201,162,39,0.10)');
+  glow.addColorStop(1, 'rgba(201,162,39,0)');
+  nctx.fillStyle = glow;
+  nctx.fillRect(0, 0, W, H);
+
+  /* copper traces + vias at each bend — width/opacity vary by tier, like real PCB routing */
+  circuitTraces.forEach(trace => {
+    nctx.lineWidth = trace.width;
+    nctx.strokeStyle = `rgba(201,162,39,${trace.alpha})`;
+    nctx.beginPath();
+    nctx.moveTo(trace.pts[0][0], trace.pts[0][1]);
+    nctx.lineTo(trace.pts[1][0], trace.pts[1][1]);
+    nctx.lineTo(trace.pts[2][0], trace.pts[2][1]);
+    nctx.stroke();
+
+    const via = trace.pts[1];
+    const viaSize = 1.5 + trace.width * 0.6;
+    nctx.fillStyle = 'rgba(201,162,39,0.24)';
+    nctx.fillRect(via[0]-viaSize/2, via[1]-viaSize/2, viaSize, viaSize);
+  });
+
+  /* current pulses travelling the traces toward the ring */
+  nctx.globalCompositeOperation = 'lighter';
+  circuitTraces.forEach(trace => {
+    trace.pulses.forEach(p => {
+      const t = (now * p.speed + p.phase) % 1;
+      const [x, y] = pointAlongTrace(trace.pts, trace.segLens, trace.total, t);
+      nctx.beginPath();
+      nctx.arc(x, y, p.size, 0, Math.PI * 2);
+      nctx.fillStyle = 'rgba(243,236,217,0.85)';
+      nctx.fill();
+    });
+  });
+  nctx.globalCompositeOperation = 'source-over';
+
+  /* IC-style pad at each agent origin */
+  networkAgents.forEach(agent => {
+    const ax = W * agent.x, ay = H * agent.y;
+    nctx.strokeStyle = 'rgba(201,162,39,0.4)';
+    nctx.strokeRect(ax-5, ay-5, 10, 10);
+    nctx.fillStyle = 'rgba(201,162,39,0.5)';
+    nctx.fillRect(ax-2, ay-2, 4, 4);
+  });
+
+  networkRAF = requestAnimationFrame(drawNetwork);
+}
+
+function startNetworkBackground(){
+  if(networkActive) return;
+  networkActive = true;
+  networkRAF = requestAnimationFrame(drawNetwork);
+}
+
+function stopNetworkBackground(){
+  networkActive = false;
+  if(networkRAF){ cancelAnimationFrame(networkRAF); networkRAF = null; }
+  nctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+}
 
 function drawGlowCircle(cx, cy, radius, coreAlpha, edgeAlpha){
   const g = mctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
@@ -1120,7 +1354,33 @@ function stopEnergySequence(){
   energyPhase = 'idle';
   mctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 }
+// -------- BRAHM NETWORK BACKGROUND --------
+	const networkCanvas = document.getElementById('brahm-network-bg');
+	const nctx = networkCanvas.getContext('2d');
 
+	let networkRAF = null;
+
+	const networkAgents = [
+		{ x: 0.12, y: 0.22 },
+		{ x: 0.88, y: 0.22 },
+		{ x: 0.08, y: 0.72 },
+		{ x: 0.92, y: 0.72 },
+		{ x: 0.50, y: 0.08 }
+	];
+
+	function resizeNetworkCanvas(){
+		const dpr = Math.min(window.devicePixelRatio || 1, 2);
+		networkCanvas.width = window.innerWidth * dpr;
+		networkCanvas.height = window.innerHeight * dpr;
+		networkCanvas.style.width = window.innerWidth + 'px';
+		networkCanvas.style.height = window.innerHeight + 'px';
+		nctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+		buildCircuitTraces();
+	}
+
+window.addEventListener('resize', resizeNetworkCanvas);
+resizeNetworkCanvas();
+startNetworkBackground();
 // -------- Cinematic gate intro --------
 const introEl = document.getElementById('intro');
 const wait = ms => new Promise(r=>setTimeout(r,ms));
@@ -1150,13 +1410,18 @@ async function runIntro(){
   await wait(850);
   introEl.classList.add('throw');
   triggerBlast(550);
+  stopNetworkBackground();
   await wait(550);
   introEl.classList.add('flash');
   stopEnergySequence();
   document.body.classList.remove('pre-boot');
   const desktopBg = document.getElementById('desktop-bg');
   desktopBg.play().catch(()=>{}); // start decoding only once the desktop is actually visible
+  const ambientBgm = document.getElementById('ambient-bgm');
+  ambientBgm.volume = 0.05;
+  ambientBgm.play().catch(()=>{}); // ambient loop, started on the same user gesture as the gate click
   openWin('player');
+  openWin('game');
   await wait(780);
   introEl.classList.add('fadeout');
   await wait(1150);
@@ -1195,7 +1460,11 @@ function openWin(id){
   const w = windows[id];
   if(!w) return;
   const isMobile = window.innerWidth < 640;
-  if(isMobile){ w.style.top = '70px'; w.style.left = '4vw'; }
+  if(isMobile){
+    // player and game both auto-open now — stack them instead of overlapping
+    w.style.left = '4vw';
+    w.style.top = (id === 'game') ? '300px' : '70px';
+  }
   w.classList.remove('hidden');
   focusWin(w);
 }
@@ -1304,7 +1573,7 @@ document.querySelectorAll('.pdog').forEach(dog=>{
   });
 });
 
-// -------- Audio player: New Divide, plays in-page --------
+// -------- Audio player: Intro, plays in-page --------
 const bgm = document.getElementById('bgm');
 const npBtn = document.getElementById('nowplaying');
 const playerToggle = document.getElementById('player-toggle');
@@ -1360,7 +1629,199 @@ playerBar.addEventListener('click', (e)=>{
   const ratio = (e.clientX - rect.left) / rect.width;
   if(bgm.duration) bgm.currentTime = ratio * bgm.duration;
 });
+
+// -------- RubbleRun: shoot the falling debris before it lands or hits you --------
+(function(){
+  const canvas = document.getElementById('game-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('game-score');
+  const livesEl = document.getElementById('game-lives');
+  const overlay = document.getElementById('game-overlay');
+  const overlayTitle = document.getElementById('game-overlay-title');
+  const overlaySub = document.getElementById('game-overlay-sub');
+  const startBtn = document.getElementById('game-start-btn');
+
+  let W = 300, H = 220;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function fit(){
+    const rect = canvas.getBoundingClientRect();
+    W = rect.width || 300;
+    H = rect.height || 220;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', fit);
+
+  let running = false, raf = null;
+  let ship, bullets, rocks, score, lives, spawnTimer, lastT;
+
+  function reset(){
+    fit();
+    ship = { x: W / 2, y: H - 16, w: 16 };
+    bullets = [];
+    rocks = [];
+    score = 0;
+    lives = 3;
+    spawnTimer = 0;
+    lastT = 0;
+    scoreEl.textContent = '0';
+    livesEl.textContent = '●●●';
+  }
+
+  function spawnRock(){
+    const size = 8 + Math.random() * 9;
+    rocks.push({
+      x: size + Math.random() * (W - size * 2),
+      y: -size,
+      size,
+      vy: 42 + Math.random() * 28 + score * 0.35,
+      rot: Math.random() * Math.PI * 2,
+      vr: (Math.random() - 0.5) * 2.2
+    });
+  }
+
+  function shoot(){
+    if(!running) return;
+    const now = performance.now();
+    if(bullets.length && now - bullets[bullets.length - 1].born < 150) return;
+    bullets.push({ x: ship.x, y: ship.y - 8, vy: -280, born: now });
+  }
+
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    ship.x = Math.max(10, Math.min(W - 10, e.clientX - rect.left));
+  });
+  canvas.addEventListener('click', shoot);
+  canvas.addEventListener('touchmove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    ship.x = Math.max(10, Math.min(W - 10, t.clientX - rect.left));
+    e.preventDefault();
+  }, { passive: false });
+  canvas.addEventListener('touchstart', () => shoot(), { passive: true });
+
+  function loseLife(){
+    lives -= 1;
+    livesEl.textContent = '●'.repeat(Math.max(lives, 0)) + '○'.repeat(3 - Math.max(lives, 0));
+    if(lives <= 0) gameOver();
+  }
+
+  function gameOver(){
+    running = false;
+    if(raf) cancelAnimationFrame(raf);
+    overlay.classList.remove('hidden');
+    overlayTitle.textContent = 'Game Over';
+    overlaySub.textContent = `score: ${score}`;
+    startBtn.textContent = '↺ retry';
+  }
+
+  function step(t){
+    if(!running) return;
+    raf = requestAnimationFrame(step);
+    if(!lastT) lastT = t;
+    const dt = Math.min((t - lastT) / 1000, 0.05);
+    lastT = t;
+
+    spawnTimer -= dt;
+    if(spawnTimer <= 0){
+      spawnRock();
+      spawnTimer = Math.max(0.35, 1.05 - score * 0.008);
+    }
+
+    bullets.forEach(b => b.y += b.vy * dt);
+    bullets = bullets.filter(b => b.y > -10);
+
+    rocks.forEach(r => { r.y += r.vy * dt; r.rot += r.vr * dt; });
+
+    for(let i = rocks.length - 1; i >= 0; i--){
+      const r = rocks[i];
+      let hit = false;
+      for(let j = bullets.length - 1; j >= 0; j--){
+        const b = bullets[j];
+        const dx = b.x - r.x, dy = b.y - r.y;
+        if(dx * dx + dy * dy < (r.size + 3) * (r.size + 3)){
+          bullets.splice(j, 1);
+          hit = true;
+          break;
+        }
+      }
+      if(hit){
+        rocks.splice(i, 1);
+        score += 10;
+        scoreEl.textContent = String(score);
+        continue;
+      }
+      const dx = r.x - ship.x, dy = r.y - ship.y;
+      if(dy > -14 && dy < 14 && Math.abs(dx) < r.size + ship.w / 2){
+        rocks.splice(i, 1);
+        loseLife();
+        continue;
+      }
+      if(r.y - r.size > H){
+        rocks.splice(i, 1);
+        loseLife();
+      }
+    }
+
+    render();
+  }
+
+  function render(){
+    ctx.clearRect(0, 0, W, H);
+
+    // ship — small gold delta
+    ctx.fillStyle = '#F3ECD9';
+    ctx.beginPath();
+    ctx.moveTo(ship.x, ship.y - 8);
+    ctx.lineTo(ship.x - 9, ship.y + 6);
+    ctx.lineTo(ship.x + 9, ship.y + 6);
+    ctx.closePath();
+    ctx.fill();
+
+    // bullets
+    ctx.fillStyle = '#C9A227';
+    bullets.forEach(b => ctx.fillRect(b.x - 1.5, b.y - 5, 3, 8));
+
+    // rocks — irregular hexes so they read as debris/rubble, not asteroids
+    rocks.forEach(r => {
+      ctx.save();
+      ctx.translate(r.x, r.y);
+      ctx.rotate(r.rot);
+      ctx.beginPath();
+      const sides = 6;
+      for(let k = 0; k < sides; k++){
+        const a = (Math.PI * 2 / sides) * k;
+        const rad = r.size * (0.72 + Math.sin(k * 2.3) * 0.18);
+        const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+        if(k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(30,25,19,0.92)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(201,162,39,0.75)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  function start(){
+    reset();
+    running = true;
+    overlay.classList.add('hidden');
+    raf = requestAnimationFrame(step);
+  }
+
+  startBtn.addEventListener('click', start);
+  reset();
+  render();
+})();
 </script>
+
+
 
 </body>
 </html>
