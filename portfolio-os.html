@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>shardul@brahm: ~ — BrahmShilp</title>
-<meta name="description" content="Shardul Khanduri — condensed-matter researcher and agentic-AI builder. Thin-film fabrication, DFT/DFPT, and BRAHM, a multi-agent AI research system.">
+<meta name="description" content="Shardul Khanduri — physicist and agentic-AI builder. Quantum key distribution simulation, thin-film fabrication, DFT, and BRAHM, a multi-agent AI research system.">
 <meta property="og:title" content="BrahmShilp — Shardul Khanduri">
-<meta property="og:description" content="Condensed-matter researcher and agentic-AI builder. Thin-film fabrication, DFT/DFPT, and BRAHM, a multi-agent AI research system.">
+<meta property="og:description" content="Physicist and agentic-AI builder. QKD simulation, thin-film fabrication, DFT, and BRAHM, a multi-agent AI research system.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0A0805">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230A0805'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23C9A227' font-family='monospace'%3E%E0%A4%AC%3C/text%3E%3C/svg%3E">
@@ -30,6 +30,20 @@
     --plasma-dim:rgba(243,236,217,0.22);
     --ember:#C2703D;
     --shadow-lg: 0 24px 70px rgba(0,0,0,0.6), 0 2px 0 rgba(255,255,255,0.03) inset;
+    --shadow-xl: 0 34px 90px rgba(0,0,0,0.72), 0 0 0 1px rgba(201,162,39,0.10), 0 2px 0 rgba(255,255,255,0.04) inset;
+
+    /* ---- motion system: one vocabulary of curves + durations ----
+       out  = things arriving (decelerate into rest)
+       in   = things leaving (accelerate away)
+       io   = things moving between two resting states
+       spring = small playful overshoot, used sparingly (icons, pops) */
+    --ease-out: cubic-bezier(.16,1,.3,1);
+    --ease-in: cubic-bezier(.7,0,.84,0);
+    --ease-io: cubic-bezier(.65,0,.35,1);
+    --spring: cubic-bezier(.34,1.56,.64,1);
+    --t-fast: 140ms;
+    --t-base: 260ms;
+    --t-slow: 560ms;
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
@@ -69,7 +83,12 @@
   ::selection{ background:var(--crimson-dim); }
   a{ color:var(--plasma); text-underline-offset:3px; }
   :focus-visible{ outline:2px solid var(--plasma); outline-offset:2px; border-radius:2px; }
-  @media (prefers-reduced-motion: reduce){ *{ animation-duration:0.01ms !important; } }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration:0.01ms !important; animation-iteration-count:1 !important;
+      animation-delay:0ms !important; transition-duration:0.01ms !important;
+    }
+  }
 
   /* thin custom scrollbars for the glass panels */
   .win-body::-webkit-scrollbar{ width:8px; }
@@ -105,7 +124,9 @@
 
   /* ============ DESKTOP ============ */
   #desktop{
-    position:absolute; top:32px; left:0; right:0; bottom:56px;
+    /* z-index 3: above the video tint (1) and film grain (2) — without it the
+       icons sat *under* the tint and were dimmed to ~40% brightness */
+    position:absolute; top:32px; left:0; right:0; bottom:56px; z-index:3;
     padding:28px;
     display:grid; grid-template-columns:repeat(auto-fill, 84px); grid-auto-rows:92px;
     gap:6px; align-content:start;
@@ -122,9 +143,9 @@
   .icon{
     position:relative; width:84px; height:92px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
     gap:9px; cursor:pointer; padding:10px 4px; border-radius:8px; text-align:center;
-    transition:background 0.15s, transform 0.15s;
+    transition:background var(--t-fast) ease, transform var(--t-base) var(--spring);
   }
-  .icon:hover{ background:rgba(255,255,255,0.06); transform:translateY(-1px); }
+  .icon:hover{ background:rgba(255,255,255,0.06); transform:translateY(-3px); }
   .icon:focus-visible{ background:rgba(255,255,255,0.07); }
   .icon:active .glyph{ transform:scale(0.93); }
   .icon .glyph{
@@ -133,8 +154,9 @@
     font-size:19px; border:1px solid var(--crimson); background:rgba(12,10,7,0.72);
     backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px);
     box-shadow:0 6px 18px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset;
-    transition:transform 0.12s, box-shadow 0.15s;
+    transition:transform var(--t-base) var(--spring), box-shadow var(--t-base) ease;
   }
+  .icon:hover .glyph{ transform:scale(1.06); }
   /* soft glow lives on a separate layer and only animates opacity —
      compositor-cheap, unlike animating box-shadow directly every frame */
   .icon .glyph::before{
@@ -169,6 +191,73 @@
     text-shadow:0 1px 3px rgba(0,0,0,0.8);
   }
 
+  /* ============ APP TILES: palette borrowed from yard.exe's sky ============
+     Each app gets its own "time of day" so the row reads as eight distinct
+     objects instead of eight identical dark squares. Same vars feed the dock. */
+  [data-open="about"]     { --t1:#8a3a44; --t2:#d7814a; --ink:#FFF1DD; --glow:217,129,74; }   /* dawn   */
+  [data-open="resume"]    { --t1:#3e5f7c; --t2:#7fa0b6; --ink:#F7F3E8; --glow:127,160,182; }  /* day    */
+  [data-open="research"]  { --t1:#3a1c3e; --t2:#b4533a; --ink:#FFD9BD; --glow:180,83,58; }    /* dusk   */
+  [data-open="brahm"]     { --t1:#f0c64a; --t2:#9a6a12; --ink:#1d1405; --glow:240,198,74; }   /* sun    */
+  [data-open="brahmshilp"]{ --t1:#1c1f42; --t2:#3d3a78; --ink:#EDE6CF; --glow:120,112,210; }  /* night  */
+  [data-open="skills"]    { --t1:#1d4a2a; --t2:#4f8f52; --ink:#ECF7D6; --glow:96,160,90; }    /* meadow */
+  [data-open="terminal"]  { --t1:#0b0d1a; --t2:#1d2036; --ink:#F6E27A; --glow:246,226,122; }  /* fireflies */
+  [data-open="contact"]   { --t1:#5c2430; --t2:#e08a4f; --ink:#FFF4E2; --glow:224,138,79; }   /* sunset */
+
+  /* ID-scoped so it beats the old .red/.cyan/.ember monochrome classes */
+  #desktop .icon .glyph{
+    color:var(--ink); border:1px solid rgba(255,255,255,0.20);
+    background:
+      radial-gradient(120% 70% at 30% 0%, rgba(255,255,255,0.28), rgba(255,255,255,0) 55%),
+      linear-gradient(160deg, var(--t2) 0%, var(--t1) 100%);
+    box-shadow:
+      0 8px 20px rgba(0,0,0,0.55),
+      0 0 18px rgba(var(--glow), calc(0.18 + var(--night, 0) * 0.30)),
+      inset 0 1px 0 rgba(255,255,255,0.30),
+      inset 0 -2px 6px rgba(0,0,0,0.30);
+    text-shadow:0 1px 2px rgba(0,0,0,0.35), 0 0 10px rgba(var(--glow), 0.55);
+    font-size:20px;
+  }
+  /* night tiles get a few stars */
+  #desktop .icon[data-open="brahmshilp"] .glyph,
+  #desktop .icon[data-open="terminal"] .glyph{
+    background:
+      radial-gradient(1px 1px at 22% 28%, rgba(255,255,255,0.9), transparent 1.5px),
+      radial-gradient(1px 1px at 76% 20%, rgba(255,255,255,0.7), transparent 1.5px),
+      radial-gradient(1px 1px at 64% 78%, rgba(255,255,255,0.55), transparent 1.5px),
+      radial-gradient(120% 70% at 30% 0%, rgba(255,255,255,0.16), rgba(255,255,255,0) 55%),
+      linear-gradient(160deg, var(--t2) 0%, var(--t1) 100%);
+  }
+  #desktop .icon[data-open="brahm"] .glyph{ text-shadow:0 1px 0 rgba(255,255,255,0.35); }
+  /* the halo behind each tile takes the tile's own colour, and breathes
+     brighter as yard.exe's clock moves into night (--night: 0 → 1) */
+  #desktop .icon .glyph::before{
+    background:radial-gradient(circle, rgba(var(--glow), 0.75) 0%, rgba(var(--glow), 0) 70%);
+    inset:-9px; opacity:calc(0.30 + var(--night, 0) * 0.35);
+  }
+  @keyframes iconGlow{ 0%,100%{ opacity:calc(0.25 + var(--night, 0) * 0.30); } 50%{ opacity:calc(0.55 + var(--night, 0) * 0.40); } }
+  #desktop .icon:hover .glyph::before{ opacity:1; }
+  #desktop .icon .glyph::after{ opacity:0.55; filter:brightness(1.6) saturate(0.4); }
+  #desktop .icon:hover .glyph{ filter:brightness(1.12) saturate(1.1); }
+  #desktop .icon .glyph{ transition:transform var(--t-base) var(--spring), box-shadow var(--t-base) ease, filter var(--t-fast) ease; }
+  #desktop .icon .lbl{ background:rgba(10,8,5,0.7); }
+
+  /* dock uses the same tiles, slightly calmer */
+  .dock-btn[data-open]{
+    color:var(--ink); border-color:rgba(255,255,255,0.16);
+    background:
+      radial-gradient(120% 70% at 30% 0%, rgba(255,255,255,0.22), rgba(255,255,255,0) 55%),
+      linear-gradient(160deg, var(--t2) 0%, var(--t1) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -2px 5px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.4);
+    text-shadow:0 0 8px rgba(var(--glow), 0.5);
+  }
+  .dock-btn[data-open]:hover, .dock-btn[data-open].active{
+    color:var(--ink); border-color:rgba(255,255,255,0.32); background:
+      radial-gradient(120% 70% at 30% 0%, rgba(255,255,255,0.3), rgba(255,255,255,0) 55%),
+      linear-gradient(160deg, var(--t2) 0%, var(--t1) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.3), 0 6px 18px rgba(var(--glow), 0.35);
+  }
+  .dock-btn[data-open].active::after{ background:rgb(var(--glow)); box-shadow:0 0 6px rgb(var(--glow)); }
+
   /* record disc icon (desktop, small) */
   .disc-glyph{ position:relative; }
   .disc-glyph svg{ width:100%; height:100%; transform-origin:50% 50%; }
@@ -183,7 +272,7 @@
   .tonearm{
     position:absolute; top:-8px; right:6px; width:70px; height:70px;
     transform:rotate(-32deg); transform-origin:88% 12%;
-    transition:transform 0.5s cubic-bezier(.3,1,.4,1);
+    transition:transform 0.9s var(--ease-io);
   }
   body.audio-playing .tonearm{ transform:rotate(-8deg); }
   .track-title{ font-family:'Space Grotesk', sans-serif; font-size:1.05rem; color:var(--text); margin-top:14px; }
@@ -195,10 +284,12 @@
     display:flex; align-items:center; justify-content:center; cursor:pointer;
     transition:background 0.15s, transform 0.15s;
   }
-  .playpause-big:hover{ background:rgba(201,162,39,0.16); transform:scale(1.05); }
+  .playpause-big{ transition:background var(--t-fast), transform var(--t-base) var(--spring); }
+  .playpause-big:hover{ background:rgba(201,162,39,0.16); transform:scale(1.08); }
+  .playpause-big:active{ transform:scale(0.94); }
   .player-progress{ width:100%; margin-top:20px; }
   .player-progress .bar{ width:100%; height:4px; border-radius:4px; background:var(--line); cursor:pointer; overflow:hidden; }
-  .player-progress .bar .fill{ height:100%; width:0%; background:var(--crimson); border-radius:4px; }
+  .player-progress .bar .fill{ height:100%; width:100%; background:var(--crimson); border-radius:4px; transform-origin:0 50%; transform:scaleX(0); transition:transform 250ms linear; }
   .player-times{ display:flex; justify-content:space-between; font-size:10.5px; color:var(--faint); margin-top:6px; }
 
   /* ============ WINDOWS ============ */
@@ -210,10 +301,15 @@
     box-shadow:var(--shadow-lg);
     display:flex; flex-direction:column; overflow:hidden;
     z-index:100;
-    animation:winIn 0.22s cubic-bezier(.2,.9,.3,1);
-    transform-origin:top left;
+    transform-origin:50% 0%;
+    transition:box-shadow var(--t-slow) var(--ease-out), border-color var(--t-slow) var(--ease-out);
   }
-  @keyframes winIn{ from{ opacity:0; transform:scale(0.96) translateY(6px); } to{ opacity:1; transform:scale(1) translateY(0); } }
+  /* focused window lifts toward the viewer; background windows recede a step */
+  .win.is-focused{ box-shadow:var(--shadow-xl); border-color:rgba(201,162,39,0.22); }
+  .win:not(.is-focused) .win-title{ color:var(--muted); }
+  .win:not(.is-focused) .win-title .tdot{ opacity:0.45; }
+  .win-title, .win-title .tdot{ transition:color var(--t-base) ease, opacity var(--t-base) ease; }
+  .win.dragging{ transition:none; box-shadow:0 44px 110px rgba(0,0,0,0.78), 0 0 0 1px rgba(201,162,39,0.16); }
   .win.hidden{ display:none; }
   .win-head{
     display:flex; align-items:center; justify-content:space-between;
@@ -229,8 +325,9 @@
     width:15px; height:15px; border-radius:50%; border:1px solid var(--glass-border);
     background:rgba(255,255,255,0.03); color:transparent; font-size:8px; line-height:1;
     cursor:pointer; display:flex; align-items:center; justify-content:center;
-    transition:background 0.15s, color 0.15s;
+    transition:background var(--t-fast) ease, color var(--t-fast) ease, transform var(--t-base) var(--spring);
   }
+  .win-controls button:hover{ transform:scale(1.15); }
   .win-controls button:hover{ background:var(--crimson); color:#1a0a0b; border-color:var(--crimson); }
   .win-body{ padding:22px 24px; overflow-y:auto; font-size:13px; color:var(--muted); line-height:1.75; background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.02)); }
   .win-body h3{ color:var(--text); font-size:1.2rem; margin-bottom:11px; letter-spacing:-0.01em; }
@@ -252,7 +349,7 @@
   }
   .btnlink:hover{ background:rgba(201,162,39,0.1); transform:translateY(-1px); }
   .stat-row{ display:flex; gap:32px; margin:16px 0 20px; flex-wrap:wrap; }
-  .stat b{ display:block; font-family:'Space Grotesk', sans-serif; font-size:1.6rem; color:var(--crimson); text-shadow:0 0 20px rgba(201,162,39,0.35); }
+  .stat b{ display:block; font-variant-numeric:tabular-nums; font-family:'Space Grotesk', sans-serif; font-size:1.6rem; color:var(--crimson); text-shadow:0 0 20px rgba(201,162,39,0.35); }
   .stat span{ font-size:10.5px; color:var(--faint); text-transform:uppercase; letter-spacing:0.05em; }
 
   /* Terminal specific */
@@ -310,65 +407,86 @@
   .dock-btn{
     width:44px; height:44px; border-radius:11px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.03);
     display:flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer;
-    color:var(--muted); transition:transform 0.16s cubic-bezier(.2,.9,.3,1), border-color 0.15s, color 0.15s, background 0.15s;
-    position:relative;
+    color:var(--muted); transition:transform var(--t-base) var(--ease-out), border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+    position:relative; transform-origin:50% 100%; will-change:transform;
   }
+  #dock.magnify .dock-btn{ transition:transform 90ms linear, border-color var(--t-fast), color var(--t-fast), background var(--t-fast); }
   .dock-btn:hover{ transform:translateY(-7px) scale(1.05); color:var(--text); border-color:var(--crimson-dim); background:rgba(255,255,255,0.06); }
   .dock-btn:active{ transform:translateY(-3px) scale(0.97); }
+  .dock-btn .ico{ display:inline-block; }
+  .dock-btn .tip{
+    position:absolute; bottom:calc(100% + 12px); left:50%; transform:translate(-50%,4px);
+    font-size:10.5px; color:var(--text); white-space:nowrap; pointer-events:none;
+    background:rgba(16,13,9,0.88); border:1px solid var(--glass-border); padding:4px 8px; border-radius:5px;
+    opacity:0; transition:opacity var(--t-fast) ease, transform var(--t-base) var(--ease-out);
+  }
+  @media (hover:hover){ .dock-btn:hover .tip{ opacity:1; transform:translate(-50%,0); } }
   .dock-btn.active{ color:var(--crimson); border-color:var(--crimson-dim); }
+  .dock-btn::after{
+    content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%) scale(0);
+    width:4px; height:4px; border-radius:50%; background:var(--crimson); box-shadow:0 0 6px var(--crimson);
+    transition:transform var(--t-base) var(--spring);
+  }
   .dock-btn.active::after{
-    content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+    content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%) scale(1);
     width:4px; height:4px; border-radius:50%; background:var(--crimson); box-shadow:0 0 6px var(--crimson);
   }
 
-  /* ============ PIXEL GRASSLAND WIDGET ============ */
+  /* ============ PIXEL GRASSLAND WIDGET (yard.exe) ============
+     A tiny simulated world drawn to a low-res canvas and upscaled with
+     nearest-neighbour, so every element snaps to the same pixel grid. */
   #terrarium{
     position:fixed; right:22px; bottom:78px; z-index:600;
     width:236px; height:132px; border-radius:10px; overflow:hidden;
     border:1px solid var(--glass-border); box-shadow:var(--shadow-lg);
-    background:#1B1F26;
+    background:#0c0d16; cursor:pointer; outline:none;
+    transition:box-shadow var(--t-base) ease, border-color var(--t-base) ease, transform var(--t-base) var(--spring);
   }
-  #terrarium svg{ width:100%; height:100%; display:block; image-rendering:pixelated; shape-rendering:crispEdges; }
-  #terrarium .tt-label{
-    position:absolute; top:6px; left:8px; font-size:9px; letter-spacing:0.06em; color:rgba(255,255,255,0.55);
-    text-shadow:0 1px 2px rgba(0,0,0,0.6); pointer-events:none; text-transform:uppercase;
+  #terrarium:hover{ border-color:var(--crimson-dim); box-shadow:var(--shadow-xl); }
+  #terrarium:focus-visible{ border-color:var(--plasma); }
+  #yard-canvas{ width:100%; height:100%; display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
+  #terrarium .tt-bar{
+    position:absolute; top:5px; left:6px; right:6px; display:flex; justify-content:space-between; align-items:center;
+    pointer-events:none; font-size:9px; letter-spacing:0.06em; text-transform:uppercase;
   }
-  .cloud{ animation:drift 26s linear infinite; }
-  .cloud.c2{ animation-duration:34s; animation-delay:-10s; }
-  @keyframes drift{ 0%{ transform:translateX(-20px); } 100%{ transform:translateX(256px); } }
-
-  .pdog{ cursor:pointer; }
-  .pdog-golden{ animation:trotL 5.2s steps(1) infinite alternate; }
-  .pdog-robot{ animation:trotR 6.4s steps(1) infinite alternate; animation-delay:-2s; }
-  @keyframes trotL{
-    0%   { transform:translateX(14px) scaleX(1); }
-    48%  { transform:translateX(150px) scaleX(1); }
-    50%  { transform:translateX(150px) scaleX(-1); }
-    98%  { transform:translateX(14px) scaleX(-1); }
-    100% { transform:translateX(14px) scaleX(1); }
+  #terrarium .tt-label{ color:rgba(255,255,255,0.6); text-shadow:0 1px 2px rgba(0,0,0,0.7); }
+  #terrarium .tt-clock{
+    pointer-events:auto; cursor:pointer; color:rgba(255,255,255,0.72);
+    background:rgba(8,8,14,0.45); border:1px solid rgba(255,255,255,0.10); border-radius:4px;
+    padding:2px 5px; font-family:'JetBrains Mono', monospace; font-size:9px; letter-spacing:0.04em; text-transform:none;
+    transition:background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
   }
-  @keyframes trotR{
-    0%   { transform:translateX(160px) scaleX(-1); }
-    48%  { transform:translateX(30px) scaleX(-1); }
-    50%  { transform:translateX(30px) scaleX(1); }
-    98%  { transform:translateX(160px) scaleX(1); }
-    100% { transform:translateX(160px) scaleX(-1); }
+  #terrarium .tt-clock:hover{ background:rgba(8,8,14,0.7); border-color:var(--crimson-dim); color:var(--text); }
+  #terrarium .tt-hint{
+    position:absolute; left:6px; bottom:5px; font-size:8.5px; color:rgba(255,255,255,0.7);
+    text-shadow:0 1px 2px rgba(0,0,0,0.9); pointer-events:none; letter-spacing:0.03em;
+    opacity:0; transform:translateY(3px); transition:opacity var(--t-base) ease, transform var(--t-base) var(--ease-out);
   }
-  .pdog.paused{ animation-play-state:paused; }
-  .pdog .pleg{ animation:pstep 0.5s steps(2) infinite; transform-origin:top; }
-  .pdog.paused .pleg{ animation-play-state:paused; }
-  @keyframes pstep{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(1.5px);} }
-  .pdog .ptail{ transform-origin:right center; }
-  .pdog.wiggle .ptail{ animation:pwag 0.18s steps(2) infinite; }
-  @keyframes pwag{ 0%,100%{ transform:rotate(-16deg);} 50%{ transform:rotate(18deg);} }
-  .pdog .pbubble{ opacity:0; transition:opacity 0.15s; }
-  .pdog.wiggle .pbubble{ opacity:1; }
+  #terrarium .tt-hint{ white-space:nowrap; }
+  @media (hover:hover){ #terrarium:hover .tt-hint{ opacity:1; transform:none; } }
+  #terrarium:focus-visible .tt-hint{ opacity:1; transform:none; }
+  @media (max-width:640px){ #terrarium .tt-hint{ display:none; } #terrarium .tt-label{ display:none; } }
+  .yard-bubble{
+    position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
+    font-size:9px; line-height:1; color:#F3ECD9; background:#14161d; border:1px solid #2C3138;
+    padding:3px 5px; border-radius:3px; transform-origin:50% 100%;
+    opacity:0; transform:translate(-50%,-100%) scale(0.6);
+    transition:opacity 120ms ease, transform 260ms var(--spring);
+  }
+  .yard-bubble.show{ opacity:1; transform:translate(-50%,-100%) scale(1); }
+  .yard-bubble::after{
+    content:''; position:absolute; left:50%; bottom:-4px; width:5px; height:5px; margin-left:-3px;
+    background:#14161d; border-right:1px solid #2C3138; border-bottom:1px solid #2C3138; transform:rotate(45deg);
+  }
 
   @media (max-width:640px){
     #desktop{ grid-template-columns:repeat(auto-fill, 74px); grid-auto-rows:80px; }
     .icon{ width:74px; }
     .win{ width:92vw !important; left:4vw !important; top:70px !important; max-height:70vh; }
     #topbar .center{ display:none; }
+    #topbar .sysicons{ display:none; }
+    #topbar .left, #nowplaying{ white-space:nowrap; }
+    .stat-row{ gap:14px 26px; }
     #terrarium{ right:12px; bottom:76px; width:168px; height:100px; }
   }
 
@@ -522,6 +640,83 @@
     margin-bottom:8px;
   }
   .brahmshilp-card strong{ color:var(--text); }
+
+  /* ============ BOOT CHOREOGRAPHY ============
+     After the blast, the OS assembles itself in reading order instead of
+     fading in as one slab: chrome first (top bar), then content (icons,
+     staggered left→right), then tools (dock), then the toys (widgets).
+     fill-mode is 'backwards' so the start pose holds during each delay but
+     releases afterwards — hover transforms keep working once settled. */
+  body.booting #topbar{ animation:bootDown 0.7s var(--ease-out) 0.05s backwards; }
+  body.booting #desktop::before{ animation:bootFade 0.9s var(--ease-out) 0.15s backwards; }
+  body.booting .icon{ animation:bootRise 0.65s var(--ease-out) backwards; animation-delay:calc(0.28s + var(--i, 0) * 55ms); }
+  body.booting #dock{ animation:bootDock 0.8s var(--ease-out) 0.55s backwards; }
+  body.booting #terrarium{ animation:bootPop 0.7s var(--spring) 0.95s backwards; }
+  @keyframes bootDown{ from{ transform:translateY(-100%); opacity:0; } }
+  @keyframes bootFade{ from{ opacity:0; } }
+  @keyframes bootRise{ from{ transform:translateY(18px) scale(0.92); opacity:0; } }
+  @keyframes bootDock{ from{ transform:translate(-50%, 140%); opacity:0; } }
+  @keyframes bootPop{ from{ transform:translateY(16px) scale(0.86); opacity:0; } }
+
+  /* ============ INTRO: idle-state life ============
+     The closed gate used to be a static, barely visible outline. Now the
+     title assembles letter by letter, a light sweep travels across it, and a
+     seam of light grows along the split — anticipation for the opening. */
+  .gate-text-inner .ch{
+    display:inline-block; opacity:0; transform:translateY(0.35em);
+    animation:chIn 0.9s var(--ease-out) forwards; animation-delay:calc(0.25s + var(--ci) * 45ms);
+  }
+  .gate-text-inner .ch.sp{ width:0.32em; }
+  @keyframes chIn{ to{ opacity:1; transform:none; } }
+  .gate-text-inner{
+    background:linear-gradient(100deg, transparent 42%, rgba(243,236,217,0.55) 50%, transparent 58%) 0 0 / 300% 100% no-repeat;
+    -webkit-background-clip:text; background-clip:text;
+    animation:sweep 4.8s var(--ease-io) 1.4s infinite;
+  }
+  @keyframes sweep{ 0%{ background-position:100% 0; } 55%,100%{ background-position:0% 0; } }
+  #intro.lit .gate-text-inner{ animation:none; }
+
+  .gate-seam{
+    position:fixed; top:50%; left:50%; width:min(70vw, 900px); height:1px; z-index:32; pointer-events:none;
+    transform:translate(-50%,-50%) scaleX(0);
+    background:linear-gradient(90deg, transparent, rgba(201,162,39,0.75) 30%, #FBF3DD 50%, rgba(201,162,39,0.75) 70%, transparent);
+    box-shadow:0 0 12px 1px rgba(201,162,39,0.45);
+    opacity:0.6;
+    animation:seamGrow 1.4s var(--ease-out) 1.1s forwards;
+    transition:opacity 0.4s ease, height 0.5s var(--ease-out), box-shadow 0.5s ease;
+  }
+  @keyframes seamGrow{ to{ transform:translate(-50%,-50%) scaleX(1); } }
+  #intro.lit .gate-seam{ opacity:1; height:2px; box-shadow:0 0 22px 3px rgba(201,162,39,0.75); }
+  #intro.cracked .gate-seam, #intro.open .gate-seam{ opacity:0; }
+
+  .gate-hint{ opacity:0; animation:hintIn 0.8s var(--ease-out) 1.9s forwards, hintpulse 2.4s ease-in-out 2.7s infinite; }
+  @keyframes hintIn{ to{ opacity:0.75; } }
+  /* the bottom door trails the top one by a beat — two physical doors, not one div */
+  #gate-bottom{ transition-delay:0s; }
+  #intro.open #gate-bottom{ transition-delay:70ms; }
+
+  .intro-skip{
+    position:fixed; right:22px; bottom:20px; z-index:70;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--faint); background:rgba(10,8,5,0.55); border:1px solid var(--glass-border);
+    padding:7px 12px; border-radius:6px; cursor:pointer; opacity:0; pointer-events:none;
+    transition:opacity var(--t-base) ease, color var(--t-fast) ease, border-color var(--t-fast) ease;
+  }
+  #intro.lit .intro-skip{ opacity:1; pointer-events:auto; transition-delay:0.6s; }
+  #intro.flash .intro-skip{ opacity:0; pointer-events:none; transition-delay:0s; }
+  .intro-skip:hover{ color:var(--text); border-color:var(--crimson-dim); }
+
+  /* agent chips in BRAHM/ */
+  .agents{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:8px; margin:6px 0 16px; }
+  .agent{ border:1px solid var(--glass-border); border-radius:7px; padding:8px 10px; background:rgba(0,0,0,0.16); transition:border-color var(--t-fast), transform var(--t-base) var(--spring); }
+  .agent:hover{ border-color:var(--crimson-dim); transform:translateY(-2px); }
+  .agent b{ display:block; color:var(--crimson); font-size:11px; letter-spacing:0.08em; }
+  .agent span{ font-size:10.5px; color:var(--faint); line-height:1.4; }
+  .now-badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--crimson); border:1px solid var(--crimson-dim); padding:3px 7px; border-radius:4px; margin-left:6px; vertical-align:2px;
+  }
+  .now-badge::before{ content:''; width:5px; height:5px; border-radius:50%; background:var(--crimson); animation:blip 2.4s ease-in-out infinite; }
 </style>
 
 <script type="importmap">
@@ -565,8 +760,11 @@
       <div class="gate-lotus">✿</div>
     </div>
 
+    <div class="gate-seam" aria-hidden="true"></div>
     <div class="gate-hint" id="gate-hint">click to enter</div>
   </div>
+
+  <button class="intro-skip" id="intro-skip" type="button">skip intro ↵</button>
 
   <canvas id="matter-canvas"></canvas>
 
@@ -600,78 +798,25 @@
 </div>
 
 <!-- PIXEL GRASSLAND WIDGET -->
-<div id="terrarium" title="Brahmshilp's yard">
-  <span class="tt-label">yard.exe</span>
-  <svg viewBox="0 0 176 100" xmlns="http://www.w3.org/2000/svg">
-    <!-- sky -->
-    <rect x="0" y="0" width="176" height="20" fill="#12131c"/>
-    <rect x="0" y="20" width="176" height="20" fill="#2b1830"/>
-    <rect x="0" y="40" width="176" height="24" fill="#5c2430"/>
-    <!-- sun -->
-    <rect x="140" y="44" width="10" height="10" fill="#C2703D"/>
-    <rect x="138" y="46" width="14" height="6" fill="#C2703D" opacity="0.5"/>
-    <!-- clouds -->
-    <g class="cloud" fill="#E7E9EC" opacity="0.55">
-      <rect x="10" y="12" width="10" height="3"/><rect x="13" y="9" width="8" height="3"/>
-    </g>
-    <g class="cloud c2" fill="#E7E9EC" opacity="0.4">
-      <rect x="60" y="24" width="12" height="3"/><rect x="64" y="21" width="7" height="3"/>
-    </g>
-    <!-- ground -->
-    <rect x="0" y="64" width="176" height="36" fill="#132b19"/>
-    <g fill="#22461f" opacity="0.85">
-      <rect x="6" y="70" width="4" height="2"/><rect x="30" y="76" width="4" height="2"/>
-      <rect x="58" y="68" width="4" height="2"/><rect x="90" y="80" width="4" height="2"/>
-      <rect x="120" y="72" width="4" height="2"/><rect x="150" y="84" width="4" height="2"/>
-      <rect x="20" y="90" width="4" height="2"/><rect x="105" y="92" width="4" height="2"/>
-    </g>
-    <g fill="#3f7a45" opacity="0.7">
-      <rect x="16" y="66" width="2" height="2"/><rect x="46" y="82" width="2" height="2"/>
-      <rect x="78" y="72" width="2" height="2"/><rect x="112" y="88" width="2" height="2"/>
-      <rect x="140" y="70" width="2" height="2"/><rect x="165" y="90" width="2" height="2"/>
-    </g>
-
-    <!-- golden retriever -->
-    <g class="pdog pdog-golden" tabindex="0">
-      <g class="pbubble">
-        <rect x="2" y="52" width="20" height="9" fill="#20242C" stroke="#2C3138" stroke-width="0.5"/>
-        <text x="12" y="58.5" font-size="5" fill="#E7E9EC" text-anchor="middle" font-family="'JetBrains Mono',monospace">wag!</text>
-      </g>
-      <rect class="ptail" x="-3" y="69" width="4" height="2" fill="#B8863A"/>
-      <rect x="0" y="70" width="14" height="6" fill="#D4A24C"/>
-      <rect x="12" y="66" width="6" height="6" fill="#D4A24C"/>
-      <rect x="16" y="65" width="3" height="2" fill="#B8863A"/>
-      <rect x="18" y="69" width="2" height="2" fill="#3a2a12"/>
-      <rect class="pleg" x="2" y="76" width="2" height="4" fill="#B8863A"/>
-      <rect class="pleg" x="10" y="76" width="2" height="4" fill="#B8863A"/>
-    </g>
-
-    <!-- machine dog -->
-    <g class="pdog pdog-robot" tabindex="0">
-      <g class="pbubble">
-        <rect x="2" y="52" width="20" height="9" fill="#20242C" stroke="#2C3138" stroke-width="0.5"/>
-        <text x="12" y="58.5" font-size="5" fill="#F3ECD9" text-anchor="middle" font-family="'JetBrains Mono',monospace">beep</text>
-      </g>
-      <rect class="ptail" x="-3" y="69" width="4" height="2" fill="#F3ECD9"/>
-      <rect x="0" y="70" width="14" height="6" fill="#3A3F47"/>
-      <rect x="12" y="66" width="6" height="6" fill="#3A3F47"/>
-      <rect x="16" y="68" width="2" height="2" fill="#F3ECD9"/>
-      <rect x="17" y="63" width="1" height="3" fill="#F3ECD9"/>
-      <rect x="16.5" y="61" width="2" height="2" fill="#C2703D"/>
-      <rect class="pleg" x="2" y="76" width="2" height="4" fill="#20242C"/>
-      <rect class="pleg" x="10" y="76" width="2" height="4" fill="#20242C"/>
-    </g>
-  </svg>
+<div id="terrarium" tabindex="0" role="group" aria-label="yard.exe — a pixel yard with two dogs. Click the grass to throw a ball; press Enter to throw one.">
+  <canvas id="yard-canvas" role="img" aria-label="Pixel yard: a golden retriever and a robot dog under a sky that follows your local time"></canvas>
+  <div class="tt-bar">
+    <span class="tt-label">yard.exe</span>
+    <button class="tt-clock" id="yard-clock" type="button" title="time-lapse: skip ahead 6 hours">☀ 12:00</button>
+  </div>
+  <div class="tt-hint">click grass: throw · tap a dog</div>
+  <div class="yard-bubble" id="yard-bubble-0"></div>
+  <div class="yard-bubble" id="yard-bubble-1"></div>
 </div>
 
 <!-- DOCK -->
 <div id="dock">
-  <div class="dock-btn" data-open="research" title="Research">▣</div>
-  <div class="dock-btn" data-open="brahm" title="BRAHM">◈</div>
-  <div class="dock-btn" data-open="brahmshilp" title="Brahmshilp">✺</div>
-  <div class="dock-btn" data-open="skills" title="Skills">$</div>
-  <div class="dock-btn" data-open="terminal" title="Terminal">▶</div>
-  <div class="dock-btn" data-open="contact" title="Contact">✉</div>
+  <div class="dock-btn" data-open="research" tabindex="0" role="button" aria-label="Research"><span class="ico">▣</span><span class="tip">Research</span></div>
+  <div class="dock-btn" data-open="brahm" tabindex="0" role="button" aria-label="BRAHM"><span class="ico">◈</span><span class="tip">BRAHM</span></div>
+  <div class="dock-btn" data-open="brahmshilp" tabindex="0" role="button" aria-label="Brahmshilp"><span class="ico">✺</span><span class="tip">Brahmshilp</span></div>
+  <div class="dock-btn" data-open="skills" tabindex="0" role="button" aria-label="Skills"><span class="ico">$</span><span class="tip">Skills</span></div>
+  <div class="dock-btn" data-open="terminal" tabindex="0" role="button" aria-label="Terminal"><span class="ico">▶</span><span class="tip">Terminal</span></div>
+  <div class="dock-btn" data-open="contact" tabindex="0" role="button" aria-label="Contact"><span class="ico">✉</span><span class="tip">Contact</span></div>
 </div>
 
 <!-- ============ WINDOWS ============ -->
@@ -684,7 +829,8 @@
   <div class="win-body">
     <h3>Shardul Khanduri</h3>
     <p class="meta-row">Delhi, India · shardulkhanduriphy@gmail.com · github.com/Shardul-collab</p>
-    <p>Condensed-matter researcher who fabricates gas-sensing thin films by hand, and an engineer building multi-agent AI systems to automate the science around them. This site is the bridge between those two things — one lab, one terminal.</p>
+    <p>Physicist who has fabricated gas-sensing thin films by hand and now simulates quantum-secured optical networks — and an engineer building multi-agent AI systems to automate the science around both. This site is the bridge between those things: one lab, one terminal.</p>
+    <p><span class="now-badge">now</span> Junior Research Fellow at NSUT, building an indigenous BB84 QKD network simulator on a TTDF-sponsored project.</p>
     <p style="color:var(--faint); font-size:11.5px;">tip: open <span class="tag">Terminal</span> and try <span class="tag">whoami</span></p>
   </div>
 </div>
@@ -718,6 +864,13 @@
     <div class="win-controls"><button data-close>✕</button></div>
   </div>
   <div class="win-body">
+    <h4>Junior Research Fellow — NSUT, Delhi <span style="color:var(--faint); font-weight:400;">Aug 2026–Present</span></h4>
+    <p class="meta-row"><span class="now-badge" style="margin:0 6px 0 0;">current</span>TTDF-sponsored project · Quantum communication for telecommunication optical network security</p>
+    <ul>
+      <li>Building an indigenous BB84 quantum-key-distribution network simulator: source, fibre attenuation, PMD, multicore-fibre crosstalk and single-photon detector models, with analytical and Monte-Carlo execution modes.</li>
+      <li>Implemented decoy-state (vacuum + weak) parameter estimation and the GLLP secure-key-rate module, validating it against published experimental benchmarks — every formula traced to its source paper, every tolerance documented.</li>
+      <li>Co-authoring the project's milestone reports to the funding agency.</li>
+    </ul>
     <h4>Master's Thesis Researcher — CSIR-NPL <span style="color:var(--faint); font-weight:400;">Jan–Jun 2025</span></h4>
     <ul>
       <li>Designed and executed a full thin-film fabrication pipeline: ZnSe via thermal vacuum deposition, Au contacts via RF magnetron sputtering.</li>
@@ -745,13 +898,22 @@
     <h3>BRAHM — Multi-Agent AI Research Ecosystem</h3>
     <p class="meta-row">Solo Architect & Developer · 2025–Present</p>
     <div class="stat-row">
-      <div class="stat"><b>5</b><span>Agents</span></div>
-      <div class="stat"><b>52+</b><span>Tools</span></div>
-      <div class="stat"><b>1</b><span>Engineer</span></div>
+      <div class="stat"><b data-to="5">5</b><span>Agents</span></div>
+      <div class="stat"><b data-to="52" data-suffix="+">52+</b><span>Tools</span></div>
+      <div class="stat"><b data-to="10000" data-suffix="+">10,000+</b><span>Papers collected</span></div>
+      <div class="stat"><b data-to="1">1</b><span>Engineer</span></div>
+    </div>
+    <div class="agents">
+      <div class="agent"><b>SHANI</b><span>literature retrieval &amp; extraction pipeline</span></div>
+      <div class="agent"><b>VISHWAKARMA</b><span>Quantum ESPRESSO DFT orchestration</span></div>
+      <div class="agent"><b>VIDUR</b><span>instrument-file classification (XRD &amp; more)</span></div>
+      <div class="agent"><b>CHITRAGUPTA</b><span>voice-first research logging</span></div>
+      <div class="agent"><b>GANESH</b><span>review writing on local models only</span></div>
     </div>
     <ul>
       <li>5-agent system automating literature retrieval, knowledge extraction, DFT orchestration, and report generation.</li>
-      <li>Retrieval backbone: RAG over FAISS, FastAPI microservices, SQLite — coordinated under Model Context Protocol (MCP).</li>
+      <li>Retrieval backbone: RAG over FAISS, FastAPI microservices, SQLite — coordinated under Model Context Protocol (MCP), with a code knowledge graph of the system itself.</li>
+      <li>Literature retrieval uses only legitimate programmatic APIs (CrossRef, Unpaywall, PubMed, arXiv); confidential writing stays on local models.</li>
       <li>Orchestration layer bridges natural-language queries to executable Quantum ESPRESSO DFT jobs.</li>
       <li>Full-stack solo build: system design, agent logic, backend infra, RAG pipeline.</li>
     </ul>
@@ -789,6 +951,12 @@
       <span class="chip">Python</span><span class="chip">C</span><span class="chip">Bash</span><span class="chip">Git</span>
       <span class="chip">FastAPI</span><span class="chip">SQLite</span><span class="chip">MCP</span>
       <span class="chip">Multi-Agent Systems</span><span class="chip">FAISS</span><span class="chip">RAG</span>
+      <span class="chip">NumPy</span><span class="chip">Local LLMs (Ollama)</span><span class="chip">Three.js / WebGL</span>
+    </div>
+    <h4>Quantum Communication</h4>
+    <div class="chips">
+      <span class="chip">BB84 QKD</span><span class="chip">Decoy-State / GLLP Key Rate</span><span class="chip">Fibre &amp; PMD Modelling</span>
+      <span class="chip">Monte-Carlo Simulation</span><span class="chip">OptiSystem</span>
     </div>
     <h4>Materials Fabrication</h4>
     <div class="chips">
@@ -836,7 +1004,7 @@
         <circle cx="50" cy="50" r="30" fill="none" stroke="#1c1f24" stroke-width="1"/>
         <circle cx="50" cy="50" r="22" fill="none" stroke="#1c1f24" stroke-width="1"/>
         <circle cx="50" cy="50" r="15" fill="#C9A227"/>
-        <text x="50" y="48" text-anchor="middle" font-size="4.2" fill="#1a0b0c" font-family="'Space Grotesk',sans-serif" font-weight="700">SHARDUL KHANDURI</text>
+        <text x="50" y="48.5" text-anchor="middle" font-size="3.1" textLength="23" lengthAdjust="spacingAndGlyphs" fill="#1a0b0c" font-family="'Space Grotesk',sans-serif" font-weight="700">SHARDUL KHANDURI</text>
         <text x="50" y="55" text-anchor="middle" font-size="3.4" fill="#1a0b0c" font-family="'JetBrains Mono',monospace">INTRO</text>
         <circle cx="50" cy="50" r="2.4" fill="#0C0D10"/>
       </svg>
@@ -1010,21 +1178,42 @@ window.addEventListener('resize', resize);
 
 const clock3d = new THREE.Clock();
 
+// Pointer parallax: the figure turns slightly toward the cursor and the
+// camera drifts against it, so the reveal feels inhabited, not playback.
+let ptrX = 0, ptrY = 0, ptrSX = 0, ptrSY = 0;
+window.addEventListener('pointermove', (e) => {
+  ptrX = (e.clientX / window.innerWidth) * 2 - 1;
+  ptrY = (e.clientY / window.innerHeight) * 2 - 1;
+}, { passive: true });
+
+// Frame-rate independent smoothing: the old fixed per-frame factors made the
+// dolly twice as fast on a 120 Hz screen as on 60 Hz. damp() normalises that.
+const damp = (k, dt) => 1 - Math.pow(1 - k, dt * 60);
+let introAlive = true;
+window.brahmStop3D = () => { introAlive = false; };
+
 function animate() {
+  if (!introAlive) return; // intro is gone — stop burning GPU behind the desktop
   requestAnimationFrame(animate);
-  const t = clock3d.getElapsedTime();
+  const dt = Math.min(clock3d.getDelta(), 0.1);
+  const t = clock3d.elapsedTime;
+
+  ptrSX += (ptrX - ptrSX) * damp(0.06, dt);
+  ptrSY += (ptrY - ptrSY) * damp(0.06, dt);
 
   if (model) {
     // Subtle breathing/float motion keeps the reveal alive without requiring a rig.
     model.position.y = baseY + Math.sin(t * 1.15) * 0.006;
-    targetRotY = Math.sin(t * 0.28) * 0.12;
-    model.rotation.y += (targetRotY - model.rotation.y) * 0.035;
+    targetRotY = Math.sin(t * 0.28) * 0.12 + ptrSX * 0.22;
+    model.rotation.y += (targetRotY - model.rotation.y) * damp(0.035, dt);
+    model.rotation.x += ((ptrSY * 0.05) - model.rotation.x) * damp(0.035, dt);
   }
 
   // Smooth camera dolly: pulls back from the tight entrance shot to the
   // full-figure resting frame once brahmRevealCamera() has been triggered.
-  camZ += (camTargetZ - camZ) * 0.045;
-  camLookY += (camTargetLookY - camLookY) * 0.045;
+  camZ += (camTargetZ - camZ) * damp(0.045, dt);
+  camLookY += (camTargetLookY - camLookY) * damp(0.045, dt);
+  camera.position.x = -ptrSX * 0.05;
   camera.position.z = camZ;
   camera.lookAt(0, camLookY, 0);
 
@@ -1383,7 +1572,38 @@ resizeNetworkCanvas();
 startNetworkBackground();
 // -------- Cinematic gate intro --------
 const introEl = document.getElementById('intro');
-const wait = ms => new Promise(r=>setTimeout(r,ms));
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Split the gate title into per-letter spans so it can assemble on load.
+document.querySelectorAll('.gate-text-inner').forEach(el => {
+  const txt = el.textContent;
+  el.textContent = '';
+  [...txt].forEach((c, i) => {
+    const sp = document.createElement('span');
+    sp.className = 'ch' + (c === ' ' ? ' sp' : '');
+    sp.style.setProperty('--ci', i);
+    sp.textContent = c === ' ' ? '\u00a0' : c;
+    el.appendChild(sp);
+  });
+});
+// Stagger index for the desktop icons' boot cascade.
+document.querySelectorAll('#desktop .icon').forEach((ic, i) => ic.style.setProperty('--i', i));
+
+// Skippable timeline: every beat goes through wait(); skipping resolves all
+// pending and future beats immediately, so the same code path runs either way
+// and the end state is always identical.
+let introSkipped = REDUCED;
+const pendingWaits = new Set();
+const wait = ms => introSkipped ? Promise.resolve() : new Promise(r => {
+  const done = () => { clearTimeout(id); pendingWaits.delete(done); r(); };
+  const id = setTimeout(done, ms);
+  pendingWaits.add(done);
+});
+function skipIntro(){
+  if(introSkipped) return;
+  introSkipped = true;
+  [...pendingWaits].forEach(fn => fn());
+}
 let introRunning = false;
 
 async function runIntro(){
@@ -1404,30 +1624,48 @@ async function runIntro(){
   window.brahmRevealCamera && window.brahmRevealCamera();
   await wait(1650);
   introEl.classList.add('arm-in');
-  startEnergySequence(850, 850);
+  if(!introSkipped) startEnergySequence(850, 850);
   await wait(850);
   introEl.classList.add('grab');
   await wait(850);
   introEl.classList.add('throw');
-  triggerBlast(550);
+  if(!introSkipped) triggerBlast(550);
   stopNetworkBackground();
   await wait(550);
   introEl.classList.add('flash');
   stopEnergySequence();
   document.body.classList.remove('pre-boot');
+  if(!REDUCED) document.body.classList.add('booting');
   const desktopBg = document.getElementById('desktop-bg');
   desktopBg.play().catch(()=>{}); // start decoding only once the desktop is actually visible
   const ambientBgm = document.getElementById('ambient-bgm');
   ambientBgm.volume = 0.05;
   ambientBgm.play().catch(()=>{}); // ambient loop, started on the same user gesture as the gate click
-  openWin('player');
-  openWin('game');
+  // widgets arrive after the dock, as the last beat of the boot cascade
+  setTimeout(() => openWin('player'), REDUCED ? 0 : 1050);
+  // on phones both widgets would stack on top of each other — keep it to one
+  if(window.innerWidth >= 640) setTimeout(() => openWin('game'), REDUCED ? 0 : 1180);
   await wait(780);
   introEl.classList.add('fadeout');
   await wait(1150);
   introEl.classList.add('done');
+  window.brahmStop3D && window.brahmStop3D();
+  setTimeout(() => document.body.classList.remove('booting'), 2200);
 }
 introEl.addEventListener('click', runIntro);
+document.getElementById('intro-skip').addEventListener('click', (e) => {
+  e.stopPropagation();
+  skipIntro();
+  runIntro();
+});
+document.addEventListener('keydown', (e) => {
+  if(introEl.classList.contains('done')) return;
+  if(e.key === 'Escape' || e.key === 'Enter' || e.key === ' '){
+    e.preventDefault();
+    if(introRunning || e.key === 'Escape') skipIntro();
+    runIntro();
+  }
+});
 
 // -------- Clock --------
 function tickClock(){
@@ -1436,7 +1674,9 @@ function tickClock(){
   const m = String(d.getMinutes()).padStart(2,'0');
   document.getElementById('clock').textContent = `${h}:${m}`;
 }
-tickClock(); setInterval(tickClock, 15000);
+tickClock();
+// align ticks to the minute boundary so the clock never lags by up to 15 s
+setTimeout(() => { tickClock(); setInterval(tickClock, 60000); }, (60 - new Date().getSeconds()) * 1000 + 50);
 
 // -------- Window manager --------
 let zTop = 100;
@@ -1451,36 +1691,142 @@ document.querySelectorAll('.win').forEach(w=>{
 function focusWin(w){
   zTop += 1;
   w.style.zIndex = zTop;
+  document.querySelectorAll('.win.is-focused').forEach(x => x !== w && x.classList.remove('is-focused'));
+  w.classList.add('is-focused');
   document.querySelectorAll('.dock-btn').forEach(b=>b.classList.remove('active'));
   const id = w.id.replace('win-','');
   document.querySelectorAll(`[data-open="${id}"]`).forEach(el=>el.classList && el.classList.add('active'));
 }
 
-function openWin(id){
+// Windows grow out of whatever launched them (icon or dock button) and
+// collapse back into it on close — spatial continuity, so the user always
+// knows where a window came from and where it went.
+const EASE_OUT = 'cubic-bezier(.16,1,.3,1)';
+const EASE_IN = 'cubic-bezier(.7,0,.84,0)';
+const winOrigin = {};
+
+function deltaFrom(w, originEl){
+  if(!originEl) return null;
+  const o = originEl.getBoundingClientRect();
+  const r = w.getBoundingClientRect();
+  return { dx: (o.left + o.width/2) - (r.left + r.width/2), dy: (o.top + o.height/2) - (r.top + r.height/2) };
+}
+
+function cascadeContent(w){
+  if(REDUCED) return;
+  const body = w.querySelector('.win-body');
+  if(!body || body.classList.contains('player-body') || body.classList.contains('game-body')) return;
+  const items = body.querySelectorAll(':scope > *:not(ul):not(.chips):not(.agents):not(.stat-row), :scope li, :scope .chip, :scope .agent, :scope .stat');
+  [...items].slice(0, 28).forEach((el, i) => {
+    el.animate([{ opacity:0, transform:'translateY(8px)' }, { opacity:1, transform:'none' }],
+      { duration: 460, delay: 90 + i * 26, easing: EASE_OUT, fill: 'backwards' });
+  });
+}
+
+function countUp(w){
+  w.querySelectorAll('.stat b[data-to]').forEach(b => {
+    const to = +b.dataset.to, suffix = b.dataset.suffix || '';
+    if(REDUCED){ b.textContent = to.toLocaleString('en-US') + suffix; return; }
+    const t0 = performance.now(), dur = 1200;
+    (function tick(now){
+      const t = Math.min((now - t0) / dur, 1);
+      const e = 1 - Math.pow(2, -10 * t); // expo out
+      b.textContent = Math.round(to * (t === 1 ? 1 : e)).toLocaleString('en-US') + (t === 1 ? suffix : '');
+      if(t < 1) requestAnimationFrame(tick);
+    })(t0);
+  });
+}
+
+function openWin(id, originEl){
   const w = windows[id];
   if(!w) return;
+  const wasHidden = w.classList.contains('hidden');
   const isMobile = window.innerWidth < 640;
-  if(isMobile){
+  if(isMobile && wasHidden){
     // player and game both auto-open now — stack them instead of overlapping
     w.style.left = '4vw';
     w.style.top = (id === 'game') ? '300px' : '70px';
   }
   w.classList.remove('hidden');
+  w.getAnimations().forEach(a => a.cancel());
   focusWin(w);
+  if(!wasHidden){
+    // already open: acknowledge the click with a small nudge instead of nothing
+    if(!REDUCED) w.animate([{ transform:'scale(1)' }, { transform:'scale(1.012)' }, { transform:'scale(1)' }], { duration: 260, easing: 'ease-out' });
+    return;
+  }
+  winOrigin[id] = originEl || null;
+  if(REDUCED) return;
+  const d = deltaFrom(w, originEl);
+  const from = d
+    ? { opacity: 0, transform: `translate(${d.dx}px, ${d.dy}px) scale(0.18)`, filter: 'blur(6px)' }
+    : { opacity: 0, transform: 'translateY(10px) scale(0.965)', filter: 'blur(4px)' };
+  w.animate([from, { opacity: 1, transform: 'none', filter: 'blur(0px)' }],
+    { duration: d ? 560 : 420, easing: EASE_OUT });
+  cascadeContent(w);
+  countUp(w);
+}
+
+function closeWin(w){
+  const id = w.id.replace('win-','');
+  w.classList.remove('is-focused');
+  const done = () => {
+    w.classList.add('hidden');
+    document.querySelectorAll(`.dock-btn[data-open="${id}"]`).forEach(b => b.classList.remove('active'));
+  };
+  if(REDUCED){ done(); return; }
+  const origin = winOrigin[id];
+  const d = origin && origin.isConnected ? deltaFrom(w, origin) : null;
+  const to = d
+    ? { opacity: 0, transform: `translate(${d.dx}px, ${d.dy}px) scale(0.18)`, filter: 'blur(4px)' }
+    : { opacity: 0, transform: 'translateY(6px) scale(0.97)', filter: 'blur(2px)' };
+  const a = w.animate([{ opacity: 1, transform: 'none', filter: 'blur(0px)' }, to], { duration: d ? 340 : 200, easing: EASE_IN });
+  a.onfinish = () => { a.cancel(); done(); };
 }
 
 document.querySelectorAll('[data-open]').forEach(el=>{
-  el.addEventListener('click', ()=> openWin(el.dataset.open));
-  el.addEventListener('keydown', e=>{ if(e.key==='Enter') openWin(el.dataset.open); });
+  const launch = () => {
+    openWin(el.dataset.open, el);
+    // dock buttons bounce once on launch, the way a dock acknowledges an app starting
+    if(el.classList.contains('dock-btn') && !REDUCED){
+      el.querySelector('.ico').animate(
+        [{ transform:'translateY(0)' }, { transform:'translateY(-12px)', offset:0.3 }, { transform:'translateY(0)', offset:0.6 }, { transform:'translateY(-4px)', offset:0.8 }, { transform:'translateY(0)' }],
+        { duration: 620, easing: 'ease-out' });
+    }
+  };
+  el.addEventListener('click', launch);
+  el.addEventListener('keydown', e=>{ if(e.key==='Enter') launch(); });
 });
 
 document.querySelectorAll('.win').forEach(w=>{
   w.addEventListener('mousedown', ()=> focusWin(w));
   w.querySelector('[data-close]').addEventListener('click', (e)=>{
     e.stopPropagation();
-    w.classList.add('hidden');
+    closeWin(w);
   });
 });
+
+// -------- Dock magnification (fine pointers only) --------
+(function(){
+  const dock = document.getElementById('dock');
+  if(REDUCED || !window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  const btns = [...dock.querySelectorAll('.dock-btn')];
+  const RANGE = 120, MAX = 0.42, LIFT = 16;
+  dock.addEventListener('mousemove', (e) => {
+    dock.classList.add('magnify');
+    btns.forEach(b => {
+      const r = b.getBoundingClientRect();
+      const dist = Math.abs(e.clientX - (r.left + r.width / 2));
+      const f = Math.max(0, 1 - dist / RANGE);
+      const s = 1 + MAX * f * f * (3 - 2 * f); // smoothstep falloff
+      b.style.transform = `translateY(${-(s - 1) / MAX * LIFT}px) scale(${s})`;
+    });
+  });
+  dock.addEventListener('mouseleave', () => {
+    dock.classList.remove('magnify');
+    btns.forEach(b => b.style.transform = '');
+  });
+})();
 
 // -------- Dragging --------
 document.querySelectorAll('.win').forEach(w=>{
@@ -1492,6 +1838,7 @@ document.querySelectorAll('.win').forEach(w=>{
     offX = e.clientX - rect.left;
     offY = e.clientY - rect.top;
     focusWin(w);
+    w.classList.add('dragging');
   });
   window.addEventListener('mousemove', (e)=>{
     if(!dragging) return;
@@ -1502,7 +1849,7 @@ document.querySelectorAll('.win').forEach(w=>{
     w.style.left = x + 'px';
     w.style.top = y + 'px';
   });
-  window.addEventListener('mouseup', ()=> dragging=false);
+  window.addEventListener('mouseup', ()=>{ dragging=false; w.classList.remove('dragging'); });
 
   // touch support
   handle.addEventListener('touchstart', (e)=>{
@@ -1530,48 +1877,71 @@ document.querySelectorAll('.win').forEach(w=>{
 const termLog = document.getElementById('term-log');
 const termInput = document.getElementById('term-input');
 const commands = {
-  help: "Available: whoami, skills, projects, brahmshilp, contact, clear",
-  whoami: "Shardul Khanduri — condensed-matter researcher & agentic-AI builder. Currently deciding whether the dog or the robot dog is the better metaphor for that.",
-  skills: "Python · FastAPI · RAG/FAISS · MCP · TVD · Sputtering · XRD/FESEM/EDX · Quantum ESPRESSO",
-  projects: "BRAHM — 5-agent AI research ecosystem, 52+ tools, RAG + DFT orchestration. Open the BRAHM/ window for details.",
+  help: "Available: whoami, now, projects, qkd, brahm, brahmshilp, skills, contact, yard, open <app>, ls, clear",
+  whoami: "Shardul Khanduri — physicist building quantum-communication simulators by day and agentic AI for science by night. Still deciding whether the dog or the robot dog is the better metaphor for that.",
+  now: "JRF @ NSUT on a TTDF-sponsored quantum-communication project — building an indigenous BB84 QKD network simulator. Evenings: pushing BRAHM toward TRL 5.",
+  qkd: "BB84 QKD network simulator — source, fibre, PMD, multicore-fibre crosstalk and detector models; decoy-state (GLLP) secure-key-rate module, being validated against published experimental benchmarks.",
+  skills: "Python · NumPy · FastAPI · RAG/FAISS · MCP · local LLMs (Ollama) · BB84/QKD · Quantum ESPRESSO · TVD · Sputtering · XRD/FESEM/EDX",
+  projects: "QKD simulator (NSUT/TTDF) · BRAHM — 5-agent AI research ecosystem · Brahmshilp — 3D/WebGL character lab. Try: qkd, brahm, brahmshilp",
+  brahm: "BRAHM — 5 agents (SHANI, VISHWAKARMA, VIDUR, CHITRAGUPTA, GANESH), 52+ MCP tools, RAG + DFT orchestration. Type `open brahm` for details.",
   brahmshilp: "Brahmshilp — the visual 3D layer of BRAHM: GLB assets, WebGL scenes, animation, and AI-assisted worldbuilding.",
   contact: "shardulkhanduriphy@gmail.com · github.com/Shardul-collab · +91 84450 31524",
-  ls: "About.txt  Resume.pdf  Research/  BRAHM/  Brahmshilp/  skills.sh  Contact.app",
+  ls: "About.txt  Resume.pdf  Research/  BRAHM/  Brahmshilp/  skills.sh  Contact.app  RubbleRun.exe  music.exe  yard.exe",
   sudo: "Nice try. You already have full access — just click around.",
+  yard: "yard.exe — click the grass to throw a ball, tap a dog to say hi, click the clock to skip ahead 6 hours. The sky follows your local time.",
 };
+const openAliases = { about:'about', resume:'resume', research:'research', brahm:'brahm', brahmshilp:'brahmshilp', skills:'skills', contact:'contact', game:'game', rubblerun:'game', music:'player', player:'player' };
+const history = [];
+let histIdx = 0;
+let typing = null;
+
 function printLine(cmd, out){
   const c = document.createElement('div');
   c.className = 'cmdline';
   c.textContent = 'shardul@brahm:~$ ' + cmd;
   const o = document.createElement('div');
   o.className = 'out';
-  o.textContent = out;
   termLog.appendChild(c);
   termLog.appendChild(o);
+  const scroller = termLog.parentElement;
+  // typewriter: ~3 chars per frame reads as "printed by a machine", fast enough not to annoy
+  if(typing){ typing.finish(); }
+  if(REDUCED){ o.textContent = out; scroller.scrollTop = scroller.scrollHeight; return; }
+  let i = 0, raf;
+  const finish = () => { cancelAnimationFrame(raf); o.textContent = out; typing = null; scroller.scrollTop = scroller.scrollHeight; };
+  typing = { finish };
+  (function step(){
+    i = Math.min(out.length, i + 4);
+    o.textContent = out.slice(0, i);
+    scroller.scrollTop = scroller.scrollHeight;
+    if(i < out.length) raf = requestAnimationFrame(step); else typing = null;
+  })();
 }
 termInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowUp' || e.key === 'ArrowDown'){
+    if(!history.length) return;
+    e.preventDefault();
+    histIdx = Math.max(0, Math.min(history.length, histIdx + (e.key === 'ArrowUp' ? -1 : 1)));
+    termInput.value = history[histIdx] || '';
+    return;
+  }
   if(e.key !== 'Enter') return;
   const raw = termInput.value.trim();
   const cmd = raw.toLowerCase();
   termInput.value = '';
-  if(cmd === 'clear'){ termLog.innerHTML=''; return; }
-  const out = commands[cmd] || `command not found: ${raw}`;
+  if(!raw) return;
+  history.push(raw); histIdx = history.length;
+  if(cmd === 'clear'){ if(typing) typing.finish(); termLog.innerHTML=''; return; }
+  if(cmd.startsWith('open ')){
+    const target = openAliases[cmd.slice(5).trim().replace(/[\/.].*$/, '')];
+    printLine(raw, target ? `opening ${target}…` : `open: no such app: ${raw.slice(5)}`);
+    if(target) setTimeout(() => openWin(target, document.getElementById('win-terminal')), 220);
+    return;
+  }
+  const out = commands[cmd] || `command not found: ${raw} — try help`;
   printLine(raw, out);
-  termLog.parentElement.scrollTop = termLog.parentElement.scrollHeight;
 });
-
-// -------- Pixel dogs: click to wiggle & "look at screen" --------
-document.querySelectorAll('.pdog').forEach(dog=>{
-  dog.addEventListener('click', ()=>{
-    dog.classList.add('paused','wiggle');
-    setTimeout(()=> dog.classList.remove('paused','wiggle'), 1400);
-  });
-  dog.addEventListener('keydown', (e)=>{
-    if(e.key !== 'Enter') return;
-    dog.classList.add('paused','wiggle');
-    setTimeout(()=> dog.classList.remove('paused','wiggle'), 1400);
-  });
-});
+document.getElementById('win-terminal').addEventListener('mousedown', () => setTimeout(() => termInput.focus(), 0));
 
 // -------- Audio player: Intro, plays in-page --------
 const bgm = document.getElementById('bgm');
@@ -1620,7 +1990,7 @@ bgm.addEventListener('ended', ()=> setPlayingUI(false));
 bgm.addEventListener('loadedmetadata', ()=>{ playerDuration.textContent = fmtTime(bgm.duration); });
 bgm.addEventListener('timeupdate', ()=>{
   if(bgm.duration){
-    playerFill.style.width = (bgm.currentTime / bgm.duration * 100) + '%';
+    playerFill.style.transform = `scaleX(${bgm.currentTime / bgm.duration})`;
     playerCurrent.textContent = fmtTime(bgm.currentTime);
   }
 });
@@ -1629,6 +1999,474 @@ playerBar.addEventListener('click', (e)=>{
   const ratio = (e.clientX - rect.left) / rect.width;
   if(bgm.duration) bgm.currentTime = ratio * bgm.duration;
 });
+
+// -------- yard.exe: a tiny simulated pixel world --------
+// Everything is drawn at low resolution (176 px wide) and upscaled with
+// nearest-neighbour, and every coordinate is rounded, so the whole scene
+// shares one pixel grid. Sky and light follow the visitor's local clock.
+(function(){
+  const box = document.getElementById('terrarium');
+  const cv = document.getElementById('yard-canvas');
+  if(!box || !cv) return;
+  const ctx = cv.getContext('2d');
+  const clockBtn = document.getElementById('yard-clock');
+  const bubbles = [document.getElementById('yard-bubble-0'), document.getElementById('yard-bubble-1')];
+
+  // world layer (hills, ground, dogs) is drawn offscreen so the time-of-day
+  // light can be laid over it without touching the sky
+  const wl = document.createElement('canvas');
+  const wctx = wl.getContext('2d');
+
+  let W = 176, H = 99, GY = 61, LANE = [79, 85], BALL_LANE = 82;
+  function fit(){
+    const r = box.getBoundingClientRect();
+    W = 176;
+    H = Math.max(80, Math.round(W * (r.height || 132) / (r.width || 236)));
+    cv.width = wl.width = W; cv.height = wl.height = H;
+    GY = Math.round(H * 0.62);
+    LANE = [Math.round(H * 0.80), Math.round(H * 0.87)];
+    BALL_LANE = Math.round(H * 0.835);
+    ctx.imageSmoothingEnabled = wctx.imageSmoothingEnabled = false;
+    buildStatic();
+  }
+
+  // ---------- colour helpers ----------
+  const hex = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  const rgb = (c, a = 1) => `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+  const smooth = t => t * t * (3 - 2 * t);
+
+  // ---------- time-of-day keyframes ----------
+  // sky: 4 bands top→horizon · light: overlay on the world layer (rgb + alpha)
+  // cloud: rgb + alpha · n: "nightness" (stars, fireflies, emissive glow)
+  const P = {
+    night: { sky:['#07080f','#0c0e1c','#131528','#1b1b30'], light:[10,14,38,0.58], cloud:[42,44,70,0.55], n:1 },
+    dawn:  { sky:['#1a1428','#3a1f38','#7a3540','#c2703d'], light:[110,50,40,0.20], cloud:[224,160,138,0.6], n:0.25 },
+    day:   { sky:['#2b4560','#41607b','#6b8aa0','#b8b298'], light:[0,0,0,0],        cloud:[236,231,218,0.8], n:0 },
+    dusk:  { sky:['#12131c','#2b1830','#5c2430','#a0482f'], light:[80,24,36,0.30],  cloud:[200,138,122,0.5], n:0.55 },
+  };
+  const KEYS = [[0,'night'],[5,'night'],[6.5,'dawn'],[8.5,'day'],[16.5,'day'],[18.5,'dusk'],[20,'night'],[24,'night']];
+  function palette(h){
+    h = ((h % 24) + 24) % 24;
+    let i = 0; while(i < KEYS.length - 2 && KEYS[i+1][0] <= h) i++;
+    const [h0, k0] = KEYS[i], [h1, k1] = KEYS[i+1];
+    const t = smooth(h1 === h0 ? 0 : (h - h0) / (h1 - h0));
+    const a = P[k0], b = P[k1];
+    return {
+      sky: a.sky.map((c, j) => mix(hex(c), hex(b.sky[j]), t)),
+      light: mix(a.light, b.light, t),
+      cloud: mix(a.cloud, b.cloud, t),
+      n: a.n + (b.n - a.n) * t,
+    };
+  }
+  function phaseName(h){
+    h = ((h % 24) + 24) % 24;
+    if(h >= 5.5 && h < 8) return ['◐','dawn'];
+    if(h >= 8 && h < 17.5) return ['☀','day'];
+    if(h >= 17.5 && h < 19.5) return ['◑','dusk'];
+    return ['☾','night'];
+  }
+
+  // time-lapse offset (hours), animated when the clock chip is clicked
+  let offset = 0, lapse = null;
+  function hoursNow(now){
+    if(lapse){
+      const t = Math.min((now - lapse.t0) / lapse.dur, 1);
+      offset = lapse.from + (lapse.to - lapse.from) * (t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2);
+      if(t >= 1) lapse = null;
+    }
+    const d = new Date();
+    return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600 + offset;
+  }
+  clockBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const now = performance.now();
+    lapse = { t0: now, dur: REDUCED ? 1 : 1700, from: offset, to: offset + 6 };
+    wake();
+  });
+
+  // ---------- static scenery (rebuilt on resize) ----------
+  let stars = [], hillsFar = [], hillsNear = [], tufts = [], flowers = [], specks = [], flies = [];
+  const clouds = [{ x: 14, y: 10, w: 12, s: 2.2 }, { x: 70, y: 20, w: 16, s: 1.4 }, { x: 130, y: 7, w: 9, s: 3.0 }];
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  function buildStatic(){
+    seed = 7;
+    stars = Array.from({ length: 28 }, () => ({ x: Math.floor(rnd() * W), y: Math.floor(rnd() * (GY - 14)), p: rnd() * 6.28, r: 0.6 + rnd() * 1.6, big: rnd() < 0.15 }));
+    hillsFar = []; hillsNear = [];
+    for(let x = 0; x < W; x++){
+      hillsFar.push(Math.round(GY - 9 - 5 * Math.sin(x * 0.045 + 1.2) - 3 * Math.sin(x * 0.11 + 0.4)));
+      hillsNear.push(Math.round(GY - 3 - 3 * Math.sin(x * 0.07 + 2.6) - 1.5 * Math.sin(x * 0.19)));
+    }
+    tufts = Array.from({ length: 26 }, () => ({ x: Math.floor(rnd() * W), y: GY + 3 + Math.floor(rnd() * (H - GY - 5)), h: 2 + Math.floor(rnd() * 2) }));
+    flowers = Array.from({ length: 5 }, (_, i) => ({ x: Math.floor(10 + rnd() * (W - 20)), y: GY + 4 + Math.floor(rnd() * (H - GY - 8)), c: i % 2 ? '#C9A227' : '#C2703D' }));
+    specks = Array.from({ length: 30 }, () => ({ x: Math.floor(rnd() * W), y: GY + 2 + Math.floor(rnd() * (H - GY - 2)), c: rnd() < 0.5 ? '#22461f' : '#2e5a33' }));
+    flies = Array.from({ length: 8 }, () => ({ bx: rnd() * W, by: GY + 2 + rnd() * (H - GY - 10), p: rnd() * 6.28, s: 0.4 + rnd() * 0.5 }));
+  }
+
+  // ---------- dogs ----------
+  // sprite coords: facing right, feet at y=0, x centred on the body
+  const SPR = {
+    golden: { body:'#D4A24C', dark:'#B8863A', nose:'#3a2a12', leg:'#B8863A', tail:'#B8863A' },
+    robot:  { body:'#3A3F47', dark:'#2a2e35', nose:'#F3ECD9', leg:'#20242C', tail:'#F3ECD9' },
+  };
+  const dogs = [
+    { kind:'golden', x: 40, dir: 1, lane: 0, state:'walk', target: 90, t: 0, fr: 0, frT: 0, z: 0, vz: 0, happy: 0, chase: false, react: 0, speed: 18, bubble: 0 },
+    { kind:'robot',  x: 130, dir: -1, lane: 1, state:'sit', target: 130, t: 2.2, fr: 0, frT: 0, z: 0, vz: 0, happy: 0, chase: false, react: 0, speed: 15, bubble: 0 },
+  ];
+  const ball = { on: false, x: 0, z: 0, vx: 0, vz: 0, held: null, rest: 0 };
+
+  function say(i, txt, dur = 1.3){
+    const el = bubbles[i];
+    el.textContent = txt;
+    el.classList.add('show');
+    dogs[i].bubble = dur;
+  }
+
+  function pickWander(d, i){
+    const other = dogs[1 - i];
+    if(d.kind === 'robot' && rnd() < 0.4) d.target = Math.max(10, Math.min(W - 12, other.x - other.dir * 16));
+    else d.target = 12 + Math.random() * (W - 26);
+    d.state = 'walk'; d.speed = 13 + Math.random() * 8;
+  }
+
+  function hop(d, i){
+    if(d.z > 0) return;
+    d.vz = 72; d.happy = 1.6;
+    say(i, d.kind === 'golden' ? ['wag!', 'boop', '♥'][Math.floor(Math.random()*3)] : ['beep', '0101!', 'bzzt'][Math.floor(Math.random()*3)]);
+  }
+
+  function throwBall(cx, cy){
+    if(ball.held){ ball.held.carry = false; ball.held = null; }
+    ball.on = true; ball.rest = 0;
+    ball.x = Math.max(4, Math.min(W - 4, cx));
+    if(cy < BALL_LANE - 4){ ball.z = BALL_LANE - cy; ball.vz = 0; }
+    else { ball.z = 0; ball.vz = 80; }
+    ball.vx = (Math.random() - 0.5) * 50;
+    dogs.forEach((d, i) => {
+      d.chase = true; d.carry = false; d.react = d.kind === 'golden' ? 0.18 : 0.42;
+      d.state = 'alert';
+      say(i, i === 0 ? '!' : '!?', 0.9);
+    });
+  }
+
+  function updateDog(d, i, dt){
+    // vertical (hops)
+    if(d.z > 0 || d.vz){
+      d.vz -= 280 * dt; d.z += d.vz * dt;
+      if(d.z <= 0){ d.z = 0; d.vz = 0; }
+    }
+    if(d.happy > 0) d.happy -= dt;
+    if(d.bubble > 0){ d.bubble -= dt; if(d.bubble <= 0) bubbles[i].classList.remove('show'); }
+
+    let moving = false;
+    if(d.chase && ball.on && !ball.held){
+      if(d.react > 0){ d.react -= dt; }
+      else {
+        d.state = 'run';
+        d.target = ball.x;
+        const sp = d.kind === 'golden' ? 50 : 44;
+        const dx = d.target - d.x;
+        if(Math.abs(dx) > 2){ d.dir = Math.sign(dx); d.x += d.dir * sp * dt; moving = true; }
+        if(Math.abs(ball.x - d.x) < 5 && ball.z < 4){
+          ball.held = d; d.carry = true; d.chase = false;
+          d.target = W * (0.35 + Math.random() * 0.3);
+          const o = dogs[1 - i];
+          o.chase = false; o.state = 'sit'; o.t = 2.5;
+          say(i, d.kind === 'golden' ? 'mine!' : 'acquired', 1.2);
+          setTimeout(() => say(1 - i, o.kind === 'golden' ? '...' : 'beep?', 1.1), 450);
+        }
+      }
+    } else if(d.carry){
+      const dx = d.target - d.x;
+      if(Math.abs(dx) > 1.5){ d.dir = Math.sign(dx); d.x += d.dir * 26 * dt; moving = true; d.state = 'walk'; }
+      else {
+        d.carry = false; ball.held = null;
+        ball.z = 2; ball.vz = 20; ball.vx = d.dir * 18;
+        d.state = 'sit'; d.t = 3; d.happy = 2.2;
+        say(i, d.kind === 'golden' ? 'again!' : 'again?', 1.4);
+      }
+    } else if(d.state === 'walk'){
+      const dx = d.target - d.x;
+      if(Math.abs(dx) > 1){ d.dir = Math.sign(dx); d.x += d.dir * d.speed * dt; moving = true; }
+      else { d.state = Math.random() < 0.55 ? 'sit' : 'idle'; d.t = 1.5 + Math.random() * 3.5; }
+    } else if(d.state === 'sit' || d.state === 'idle' || d.state === 'alert'){
+      d.t -= dt;
+      if(d.t <= 0 && !d.chase) pickWander(d, i);
+    }
+    d.x = Math.max(9, Math.min(W - 11, d.x));
+    d.moving = moving;
+    d.frT += dt;
+    const step = d.state === 'run' ? 0.08 : 0.15;
+    if(moving && d.frT > step){ d.frT = 0; d.fr ^= 1; }
+    if(!moving) d.fr = 0;
+  }
+
+  function updateBall(dt){
+    if(!ball.on) return;
+    if(ball.held){
+      const d = ball.held;
+      ball.x = d.x + d.dir * 10; ball.z = d.z + 8;
+      return;
+    }
+    ball.vz -= 280 * dt; ball.z += ball.vz * dt;
+    if(ball.z <= 0){
+      ball.z = 0;
+      if(Math.abs(ball.vz) > 14){ ball.vz = -ball.vz * 0.45; ball.vx *= 0.75; }
+      else ball.vz = 0;
+    }
+    if(ball.z === 0 && ball.vz === 0) ball.vx *= Math.max(0, 1 - 3 * dt);
+    ball.x += ball.vx * dt;
+    if(ball.x < 3){ ball.x = 3; ball.vx = Math.abs(ball.vx) * 0.6; }
+    if(ball.x > W - 3){ ball.x = W - 3; ball.vx = -Math.abs(ball.vx) * 0.6; }
+    // a ball nobody wants eventually gets tidied away
+    if(!dogs.some(d => d.chase) && Math.abs(ball.vx) < 1){ ball.rest += dt; if(ball.rest > 14) ball.on = false; }
+  }
+
+  // ---------- drawing ----------
+  function R(c, x, y, w, h, color){ c.fillStyle = color; c.fillRect(Math.round(x), Math.round(y), w, h); }
+
+  function drawDog(c, d){
+    const s = SPR[d.kind];
+    const fy = LANE[d.lane] - Math.round(d.z);
+    const bob = d.moving && d.fr ? -1 : 0;
+    c.save();
+    c.translate(Math.round(d.x), fy);
+    if(d.dir < 0) c.scale(-1, 1);
+    c.translate(-9, 0);
+    const wag = d.happy > 0 ? (Math.floor(performance.now() / 90) % 2 ? -2 : 0) : 0;
+    if(d.state === 'sit' && !d.moving){
+      R(c, -3, -10 + wag, 4, 2, s.tail);
+      R(c, 0, -7, 12, 5, s.body);           // haunch + back
+      R(c, 1, -4, 5, 4, s.dark);            // folded back leg
+      R(c, 9, -12, 6, 7, s.body);           // chest
+      R(c, 11, -16, 6, 6, s.body);          // head
+      R(c, 15, -17, 3, 2, s.dark);          // ear
+      R(c, 17, -13, 2, 2, s.nose);
+      R(c, 10, -4, 2, 4, s.leg); R(c, 13, -4, 2, 4, s.leg);
+      if(d.kind === 'robot'){ R(c, 15, -20, 1, 3, '#F3ECD9'); }
+    } else {
+      const legA = d.fr ? 3 : 1, legB = d.fr ? 9 : 11;
+      R(c, -3, -11 + bob + wag, 4, 2, s.tail);
+      R(c, 0, -10 + bob, 14, 6, s.body);
+      R(c, 12, -14 + bob, 6, 6, s.body);
+      R(c, 16, -15 + bob, 3, 2, s.dark);
+      R(c, 18, -11 + bob, 2, 2, s.nose);
+      R(c, legA, -4, 2, 4, s.leg); R(c, legB, -4, 2, 4, s.leg);
+      if(d.kind === 'robot'){ R(c, 17, -18 + bob, 1, 3, '#F3ECD9'); R(c, 2, -9 + bob, 9, 1, '#4a505a'); }
+    }
+    c.restore();
+  }
+
+  function shadow(c, x, lane, z, w){
+    const k = Math.max(0.35, 1 - z / 30);
+    c.fillStyle = `rgba(0,0,0,${0.32 * k})`;
+    const sw = Math.round(w * k);
+    c.fillRect(Math.round(x - sw / 2), lane, sw, 1);
+  }
+
+  let lastH = -1;
+  function render(now, tSec){
+    const h = hoursNow(now);
+    const pal = palette(h);
+
+    // --- sky (banded, not gradient: pixel art) ---
+    const bandH = Math.ceil(GY / 4);
+    pal.sky.forEach((c, i) => R(ctx, 0, i * bandH, W, bandH + 1, rgb(c)));
+    // soften each band seam with a one-row midtone so it reads as banding, not a hard rule
+    for(let i = 1; i < 4; i++) R(ctx, 0, i * bandH, W, 1, rgb(mix(pal.sky[i - 1], pal.sky[i], 0.5)));
+
+    // --- stars ---
+    const sa = Math.max(0, (pal.n - 0.3) / 0.7);
+    if(sa > 0) stars.forEach(st => {
+      const a = sa * (0.45 + 0.55 * Math.max(0, Math.sin(tSec * st.r + st.p)));
+      ctx.fillStyle = `rgba(243,236,217,${a})`;
+      ctx.fillRect(st.x, st.y, 1, 1);
+      if(st.big && a > 0.6){ ctx.fillStyle = `rgba(243,236,217,${a*0.35})`; ctx.fillRect(st.x-1, st.y, 3, 1); ctx.fillRect(st.x, st.y-1, 1, 3); }
+    });
+
+    // --- sun & moon on arcs across the sky ---
+    const hh = ((h % 24) + 24) % 24;
+    const arc = f => [6 + f * (W - 16), GY - 4 - Math.sin(Math.PI * f) * (GY - 16)];
+    if(hh > 5.6 && hh < 19.4){
+      const [sx, sy] = arc((hh - 5.6) / 13.8);
+      const low = 1 - Math.min(1, Math.sin(Math.PI * (hh - 5.6) / 13.8) * 2.2);
+      const core = mix([242,193,78], [214,112,61], low);
+      // pixel halo as a stepped disc, not a square
+      ctx.fillStyle = rgb(core, 0.18);
+      R(ctx, sx - 3, sy + 1, 11, 3, ctx.fillStyle); R(ctx, sx - 2, sy - 1, 9, 7, ctx.fillStyle); R(ctx, sx, sy - 3, 5, 11, ctx.fillStyle);
+      R(ctx, sx - 1, sy, 7, 5, rgb(core)); R(ctx, sx, sy - 1, 5, 7, rgb(core));
+    }
+    if(hh > 18.6 || hh < 6.6){
+      const f = ((hh - 18.6 + 24) % 24) / 12;
+      const [mx, my] = arc(Math.min(1, f));
+      const halo = 'rgba(232,226,207,0.10)';
+      R(ctx, mx - 2, my, 10, 5, halo); R(ctx, mx, my - 2, 6, 9, halo);
+      // round 6x6 disc, then a disc-shaped bite in the sky colour → crescent
+      R(ctx, mx, my + 1, 6, 4, '#E8E2CF'); R(ctx, mx + 1, my, 4, 6, '#E8E2CF');
+      const bite = rgb(pal.sky[Math.min(3, Math.floor(my / bandH))]);
+      R(ctx, mx + 2, my + 1, 4, 3, bite); R(ctx, mx + 3, my, 3, 5, bite);
+    }
+
+    // --- clouds (sky layer, tinted by time) ---
+    const cc = pal.cloud;
+    clouds.forEach(c => {
+      const x = ((c.x + tSec * c.s) % (W + 30)) - 20;
+      ctx.fillStyle = rgb(cc, cc[3]);
+      ctx.fillRect(Math.round(x), c.y, c.w, 3);
+      ctx.fillRect(Math.round(x) + 3, c.y - 2, Math.round(c.w * 0.55), 2);
+    });
+
+    // ================= world layer =================
+    wctx.clearRect(0, 0, W, H);
+    // far hills: aerial perspective — they take on the horizon colour
+    const farC = rgb(mix(pal.sky[3], [22,20,28], 0.55));
+    const nearC = rgb(mix(pal.sky[3], [14,22,16], 0.78));
+    wctx.fillStyle = farC;
+    for(let x = 0; x < W; x++) wctx.fillRect(x, hillsFar[x], 1, GY - hillsFar[x]);
+    // the temple on the far ridge — BRAHM's little landmark
+    const tx = Math.round(W * 0.72), ty = hillsFar[tx];
+    wctx.fillStyle = rgb(mix(pal.sky[3], [12,10,14], 0.7));
+    wctx.fillRect(tx - 4, ty - 4, 9, 4); wctx.fillRect(tx - 3, ty - 7, 7, 3);
+    wctx.fillRect(tx - 2, ty - 10, 5, 3); wctx.fillRect(tx - 1, ty - 12, 3, 2); wctx.fillRect(tx, ty - 14, 1, 2);
+    wctx.fillStyle = nearC;
+    for(let x = 0; x < W; x++) wctx.fillRect(x, hillsNear[x], 1, GY - hillsNear[x] + 1);
+
+    // ground
+    R(wctx, 0, GY, W, H - GY, '#132b19');
+    R(wctx, 0, GY, W, 2, '#10241a');
+    specks.forEach(p => R(wctx, p.x, p.y, 2, 1, p.c));
+    // grass tufts sway with a slow travelling gust
+    const gust = Math.sin(tSec * 0.5);
+    tufts.forEach(t => {
+      const lean = Math.round(Math.sin(tSec * 1.7 + t.x * 0.15) * 0.6 + gust * 0.7);
+      R(wctx, t.x, t.y - 1, 1, 2, '#2e5a33');
+      R(wctx, t.x + 2, t.y - 1, 1, 2, '#2e5a33');
+      R(wctx, t.x + 1 + (lean > 0 ? 1 : lean < 0 ? -1 : 0), t.y - t.h, 1, t.h, '#3f7a45');
+    });
+    flowers.forEach(f => { R(wctx, f.x, f.y, 1, 2, '#2e5a33'); R(wctx, f.x - 1, f.y - 1, 3, 1, f.c); R(wctx, f.x, f.y - 2, 1, 1, f.c); });
+
+    // shadows, then actors back-to-front by depth lane
+    dogs.forEach(d => shadow(wctx, d.x, LANE[d.lane] + 1, d.z, 16));
+    if(ball.on && !ball.held) shadow(wctx, ball.x, BALL_LANE + 1, ball.z, 4);
+    const actors = dogs.map(d => ({ y: LANE[d.lane], draw: () => drawDog(wctx, d) }));
+    if(ball.on) actors.push({ y: ball.held ? LANE[ball.held.lane] + 0.5 : BALL_LANE, draw: () => {
+      const by = (ball.held ? LANE[ball.held.lane] : BALL_LANE) - Math.round(ball.z) - 3;
+      R(wctx, ball.x - 1, by, 3, 3, '#C2703D'); R(wctx, ball.x - 1, by, 1, 1, '#F2B07A');
+    }});
+    actors.sort((a, b) => a.y - b.y).forEach(a => a.draw());
+
+    // time-of-day light over the world only (source-atop keeps it inside drawn pixels)
+    const L = pal.light;
+    if(L[3] > 0.01){
+      wctx.globalCompositeOperation = 'source-atop';
+      wctx.fillStyle = rgb(L, L[3]);
+      wctx.fillRect(0, 0, W, H);
+      wctx.globalCompositeOperation = 'source-over';
+    }
+    ctx.drawImage(wl, 0, 0);
+
+    // ================= emissive (unlit) =================
+    const glow = pal.n;
+    // temple beacon: same 2.4 s breath as the top-bar dot
+    const beacon = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(tSec * 2.618));
+    ctx.fillStyle = `rgba(201,162,39,${beacon})`; ctx.fillRect(tx, ty - 15, 1, 1);
+    if(glow > 0.2){ ctx.fillStyle = `rgba(201,162,39,${beacon * 0.3 * glow})`; ctx.fillRect(tx - 1, ty - 16, 3, 3); }
+    // robot dog eye + antenna light
+    const rb = dogs[1];
+    const rfy = LANE[rb.lane] - Math.round(rb.z);
+    const sit = rb.state === 'sit' && !rb.moving;
+    const bobR = rb.moving && rb.fr ? -1 : 0;
+    const ex = (lx) => Math.round(rb.x) + (rb.dir < 0 ? -(lx - 9) - 1 : lx - 9);
+    ctx.fillStyle = '#F3ECD9';
+    ctx.fillRect(ex(sit ? 15 : 16), rfy + (sit ? -15 : -12 + bobR), 2, 1);
+    const blink = Math.floor(tSec / 1.6) !== Math.floor((tSec - 0.25) / 1.6);
+    ctx.fillStyle = blink ? '#F2B07A' : '#C2703D';
+    ctx.fillRect(ex(sit ? 14 : 16), rfy + (sit ? -22 : -20 + bobR), 2, 2);
+    // fireflies drift in at dusk and night
+    if(glow > 0.3) flies.forEach(f => {
+      const x = f.bx + Math.sin(tSec * f.s + f.p) * 12;
+      const y = f.by + Math.sin(tSec * f.s * 1.4 + f.p * 2) * 4;
+      const a = (glow - 0.3) / 0.7 * Math.pow(0.5 + 0.5 * Math.sin(tSec * 2.4 + f.p * 5), 2);
+      ctx.fillStyle = `rgba(246,226,122,${a * 0.28})`; ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, 3, 3);
+      ctx.fillStyle = `rgba(250,236,150,${a})`; ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+    });
+
+    // clock chip — only touch the DOM when the minute or phase changes
+    const minute = Math.floor(((h % 24) + 24) % 24 * 60);
+    if(minute !== lastH){
+      lastH = minute;
+      // share the yard's night level with the desktop so icon halos follow the same clock
+      document.body.style.setProperty('--night', pal.n.toFixed(2));
+      const [ic, name] = phaseName(h);
+      const hh2 = String(Math.floor(minute / 60)).padStart(2, '0'), mm = String(minute % 60).padStart(2, '0');
+      clockBtn.textContent = `${ic} ${name} ${hh2}:${mm}`;
+    }
+    // speech bubbles follow their dog
+    dogs.forEach((d, i) => {
+      if(d.bubble <= 0) return;
+      const el = bubbles[i];
+      const head = (d.state === 'sit' && !d.moving) ? 19 : 17;
+      el.style.left = (d.x / W * 100) + '%';
+      el.style.top = ((LANE[d.lane] - head - d.z) / H * 100) + '%';
+    });
+  }
+
+  // ---------- input ----------
+  function toWorld(e){
+    const r = cv.getBoundingClientRect();
+    return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H];
+  }
+  function dogAt(x, y){
+    for(let i = dogs.length - 1; i >= 0; i--){
+      const d = dogs[i], fy = LANE[d.lane] - d.z;
+      if(Math.abs(x - d.x) < 12 && y > fy - 20 && y < fy + 3) return i;
+    }
+    return -1;
+  }
+  cv.addEventListener('pointerdown', (e) => {
+    const [x, y] = toWorld(e);
+    const i = dogAt(x, y);
+    if(i >= 0) hop(dogs[i], i);
+    else if(!REDUCED) throwBall(x, y);
+    wake();
+  });
+  box.addEventListener('keydown', (e) => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    if(e.target === clockBtn) return;
+    e.preventDefault();
+    if(REDUCED) hop(dogs[0], 0); else throwBall(20 + Math.random() * (W - 40), GY - 20);
+    wake();
+  });
+
+  // ---------- loop: only runs while the widget is actually visible ----------
+  let raf = null, last = 0, visible = true, t = 0;
+  function frame(now){
+    raf = null;
+    if(document.hidden || !visible || document.body.classList.contains('pre-boot')){ return idle(); }
+    const dt = Math.min((now - (last || now)) / 1000, 0.05);
+    last = now; t += dt;
+    if(!REDUCED){ dogs.forEach((d, i) => updateDog(d, i, dt)); updateBall(dt); }
+    else dogs.forEach((d, i) => { if(d.bubble > 0){ d.bubble -= dt; if(d.bubble <= 0) bubbles[i].classList.remove('show'); } });
+    render(now, t);
+    // reduced motion: hold still, redraw rarely (the sky still follows the clock)
+    if(REDUCED && !lapse && !dogs.some(d => d.bubble > 0)){ setTimeout(wake, 30000); return; }
+    raf = requestAnimationFrame(frame);
+  }
+  let idleTimer = null;
+  function idle(){ last = 0; if(!idleTimer) idleTimer = setTimeout(() => { idleTimer = null; wake(); }, 600); }
+  function wake(){ if(!raf) raf = requestAnimationFrame(frame); }
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(es => { visible = es[0].isIntersecting; if(visible) wake(); }).observe(box);
+  }
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) wake(); });
+  window.addEventListener('resize', () => { fit(); wake(); });
+
+  if(REDUCED){ dogs.forEach(d => { d.state = 'sit'; d.t = 1e9; }); }
+  fit();
+  render(performance.now(), 0);
+  wake();
+})();
 
 // -------- RubbleRun: shoot the falling debris before it lands or hits you --------
 (function(){
