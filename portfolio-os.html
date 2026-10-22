@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>shardul@brahm: ~ — BrahmShilp</title>
-<meta name="description" content="Shardul Khanduri — physicist and agentic-AI builder. Quantum key distribution simulation, thin-film fabrication, DFT, and BRAHM, a multi-agent AI research system.">
+<meta name="description" content="Shardul Khanduri — physicist and agentic-AI builder. Freelance AI automation, generative AI content and debugging. Quantum key distribution simulation, thin-film fabrication, DFT, and BRAHM, a multi-agent AI research system.">
 <meta property="og:title" content="BrahmShilp — Shardul Khanduri">
 <meta property="og:description" content="Physicist and agentic-AI builder. QKD simulation, thin-film fabrication, DFT, and BRAHM, a multi-agent AI research system.">
 <meta property="og:type" content="website">
@@ -192,13 +192,14 @@
   }
 
   /* ============ APP TILES: palette borrowed from yard.exe's sky ============
-     Each app gets its own "time of day" so the row reads as eight distinct
-     objects instead of eight identical dark squares. Same vars feed the dock. */
+     Each app gets its own "time of day" so the row reads as nine distinct
+     objects instead of nine identical dark squares. Same vars feed the dock. */
   [data-open="about"]     { --t1:#8a3a44; --t2:#d7814a; --ink:#FFF1DD; --glow:217,129,74; }   /* dawn   */
   [data-open="resume"]    { --t1:#3e5f7c; --t2:#7fa0b6; --ink:#F7F3E8; --glow:127,160,182; }  /* day    */
   [data-open="research"]  { --t1:#3a1c3e; --t2:#b4533a; --ink:#FFD9BD; --glow:180,83,58; }    /* dusk   */
   [data-open="brahm"]     { --t1:#f0c64a; --t2:#9a6a12; --ink:#1d1405; --glow:240,198,74; }   /* sun    */
   [data-open="brahmshilp"]{ --t1:#1c1f42; --t2:#3d3a78; --ink:#EDE6CF; --glow:120,112,210; }  /* night  */
+  [data-open="services"]  { --t1:#173f4a; --t2:#3f9a9c; --ink:#E9FBF7; --glow:63,154,156; }   /* lake   */
   [data-open="skills"]    { --t1:#1d4a2a; --t2:#4f8f52; --ink:#ECF7D6; --glow:96,160,90; }    /* meadow */
   [data-open="terminal"]  { --t1:#0b0d1a; --t2:#1d2036; --ink:#F6E27A; --glow:246,226,122; }  /* fireflies */
   [data-open="contact"]   { --t1:#5c2430; --t2:#e08a4f; --ink:#FFF4E2; --glow:224,138,79; }   /* sunset */
@@ -792,6 +793,7 @@
   <div class="icon" data-open="research" tabindex="0"><div class="glyph cyan">▣</div><div class="lbl">Research/</div></div>
   <div class="icon" data-open="brahm" tabindex="0"><div class="glyph red">◈</div><div class="lbl">BRAHM/</div></div>
   <div class="icon" data-open="brahmshilp" tabindex="0"><div class="glyph ember">✺</div><div class="lbl">Brahmshilp/</div></div>
+  <div class="icon" data-open="services" tabindex="0"><div class="glyph cyan">⚙</div><div class="lbl">Services.app</div></div>
   <div class="icon" data-open="skills" tabindex="0"><div class="glyph cyan">$</div><div class="lbl">skills.sh</div></div>
   <div class="icon" data-open="terminal" tabindex="0"><div class="glyph red">▶</div><div class="lbl">Terminal</div></div>
   <div class="icon" data-open="contact" tabindex="0"><div class="glyph ember">✉</div><div class="lbl">Contact.app</div></div>
@@ -814,6 +816,7 @@
   <div class="dock-btn" data-open="research" tabindex="0" role="button" aria-label="Research"><span class="ico">▣</span><span class="tip">Research</span></div>
   <div class="dock-btn" data-open="brahm" tabindex="0" role="button" aria-label="BRAHM"><span class="ico">◈</span><span class="tip">BRAHM</span></div>
   <div class="dock-btn" data-open="brahmshilp" tabindex="0" role="button" aria-label="Brahmshilp"><span class="ico">✺</span><span class="tip">Brahmshilp</span></div>
+  <div class="dock-btn" data-open="services" tabindex="0" role="button" aria-label="Services"><span class="ico">⚙</span><span class="tip">Services</span></div>
   <div class="dock-btn" data-open="skills" tabindex="0" role="button" aria-label="Skills"><span class="ico">$</span><span class="tip">Skills</span></div>
   <div class="dock-btn" data-open="terminal" tabindex="0" role="button" aria-label="Terminal"><span class="ico">▶</span><span class="tip">Terminal</span></div>
   <div class="dock-btn" data-open="contact" tabindex="0" role="button" aria-label="Contact"><span class="ico">✉</span><span class="tip">Contact</span></div>
@@ -831,6 +834,7 @@
     <p class="meta-row">Delhi, India · shardulkhanduriphy@gmail.com · github.com/Shardul-collab</p>
     <p>Physicist who has fabricated gas-sensing thin films by hand and now simulates quantum-secured optical networks — and an engineer building multi-agent AI systems to automate the science around both. This site is the bridge between those things: one lab, one terminal.</p>
     <p><span class="now-badge">now</span> Junior Research Fellow at NSUT, building an indigenous BB84 QKD network simulator on a TTDF-sponsored project.</p>
+    <p><span class="now-badge">freelance</span> Taking on AI automation, generative-AI content and debugging work. Open <span class="tag">Services.app</span> for what I build and the projects behind it.</p>
     <p style="color:var(--faint); font-size:11.5px;">tip: open <span class="tag">Terminal</span> and try <span class="tag">whoami</span></p>
   </div>
 </div>
@@ -940,6 +944,52 @@
   </div>
 </div>
 
+<div class="win" id="win-services" style="top:96px; left:20%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--plasma)"></span>Services.app</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h3>Freelance — AI Automation, GenAI &amp; Debugging</h3>
+    <p class="meta-row">Available for freelance projects · Remote</p>
+    <p>I build AI systems that do real work end to end, and I fix the ones that don't. Every service below is backed by something I've built and run myself.</p>
+    <div class="agents">
+      <div class="agent"><b>AI AUTOMATION</b><span>agents, API pipelines, MCP tools, Notion &amp; data workflows</span></div>
+      <div class="agent"><b>GENERATIVE AI</b><span>AI reels, ComfyUI / AnimateDiff pipelines, AI content</span></div>
+      <div class="agent"><b>DEBUGGING</b><span>Python &amp; FastAPI bugs, API audits, async issues</span></div>
+      <div class="agent"><b>AI CONSULTING</b><span>setting up AI in your workflow, coaching</span></div>
+    </div>
+
+    <h4>AI Automation &amp; Agents</h4>
+    <ul>
+      <li>Multi-agent systems and LLM workflows wired into real tools through APIs and the Model Context Protocol (MCP).</li>
+      <li>Data pipelines that collect, filter and extract from documents — text, tables and equations out of PDFs (PyMuPDF, Camelot, pix2tex).</li>
+      <li>Voice and chat assistants that log into Notion or a database (Whisper speech-to-text, intent classification).</li>
+      <li>Local / private LLM setups with Ollama when data can't leave your machine.</li>
+    </ul>
+    <p class="meta-row"><strong>Proof:</strong> BRAHM — 5 agents, 52+ MCP tools, 10,000+ papers pulled automatically from CrossRef, Unpaywall, PubMed and arXiv across 15 parallel workflows.</p>
+
+    <h4>Generative AI Content</h4>
+    <ul>
+      <li>AI-generated short-form reels and edited reels for Instagram and YouTube Shorts.</li>
+      <li>Custom ComfyUI workflows: AnimateDiff, Stable Diffusion 1.5, LoRA — tuned to run on modest GPUs.</li>
+      <li>Script and content planning for AI-driven channels.</li>
+    </ul>
+    <p class="meta-row"><strong>Proof:</strong> MangaMotion AI — a ComfyUI + AnimateDiff pipeline that animates static manga panels into reels, built to run on a 4&nbsp;GB GPU. Brahmshilp — my own AI character and 3D web assets.</p>
+
+    <h4>Debugging &amp; Code Audits</h4>
+    <ul>
+      <li>Find and fix bugs in Python, FastAPI and AI-agent codebases — reproduced first, fixed second, verified after.</li>
+      <li>Security and reliability audits of APIs: CORS, authentication, concurrency and data-integrity issues.</li>
+      <li>Validating scientific and numerical code against published reference results.</li>
+    </ul>
+    <p class="meta-row"><strong>Proof:</strong> audited Chitragupta (BRAHM's voice-logging API) and fixed 6 critical issues — a CORS misconfiguration, a timing-attack-prone API-key check, a double-write that corrupted records, and speech processing that blocked the async server. Validated a QKD key-rate module against published experiments.</p>
+
+    <hr class="divider">
+    <a class="btnlink" href="mailto:shardulkhanduriphy@gmail.com?subject=Freelance%20project%20enquiry">Start a project ↗</a>
+  </div>
+</div>
+
 <div class="win" id="win-skills" style="top:110px; left:24%;">
   <div class="win-head" data-drag>
     <div class="win-title"><span class="tdot" style="background:var(--plasma)"></span>skills.sh</div>
@@ -952,6 +1002,13 @@
       <span class="chip">FastAPI</span><span class="chip">SQLite</span><span class="chip">MCP</span>
       <span class="chip">Multi-Agent Systems</span><span class="chip">FAISS</span><span class="chip">RAG</span>
       <span class="chip">NumPy</span><span class="chip">Local LLMs (Ollama)</span><span class="chip">Three.js / WebGL</span>
+    </div>
+    <h4>Automation &amp; Generative AI</h4>
+    <div class="chips">
+      <span class="chip">LLM Agents</span><span class="chip">Prompt Engineering</span><span class="chip">QLoRA Fine-Tuning</span>
+      <span class="chip">Whisper</span><span class="chip">REST API Integration</span><span class="chip">Notion API</span>
+      <span class="chip">PDF Extraction</span><span class="chip">ComfyUI</span><span class="chip">AnimateDiff</span>
+      <span class="chip">Stable Diffusion / LoRA</span><span class="chip">Debugging &amp; API Audits</span>
     </div>
     <h4>Quantum Communication</h4>
     <div class="chips">
@@ -1054,8 +1111,8 @@
     <div class="win-controls"><button data-close>✕</button></div>
   </div>
   <div class="win-body">
-    <h3>Let's talk research, systems, or both.</h3>
-    <p>Open to research collaborations, DFT/agentic-AI tooling discussions, and anything at the edge of the two.</p>
+    <h3>Let's talk research, systems, or a project.</h3>
+    <p>Open to freelance work in AI automation, generative AI and debugging, research collaborations, and DFT/agentic-AI tooling discussions.</p>
     <p><a href="mailto:shardulkhanduriphy@gmail.com">shardulkhanduriphy@gmail.com</a></p>
     <p><a href="https://github.com/Shardul-collab" target="_blank" rel="noopener">github.com/Shardul-collab</a></p>
     <p><a href="tel:+918445031524">+91 84450 31524</a></p>
@@ -1877,20 +1934,21 @@ document.querySelectorAll('.win').forEach(w=>{
 const termLog = document.getElementById('term-log');
 const termInput = document.getElementById('term-input');
 const commands = {
-  help: "Available: whoami, now, projects, qkd, brahm, brahmshilp, skills, contact, yard, open <app>, ls, clear",
+  help: "Available: whoami, now, projects, services, qkd, brahm, brahmshilp, skills, contact, yard, open <app>, ls, clear",
   whoami: "Shardul Khanduri — physicist building quantum-communication simulators by day and agentic AI for science by night. Still deciding whether the dog or the robot dog is the better metaphor for that.",
   now: "JRF @ NSUT on a TTDF-sponsored quantum-communication project — building an indigenous BB84 QKD network simulator. Evenings: pushing BRAHM toward TRL 5.",
   qkd: "BB84 QKD network simulator — source, fibre, PMD, multicore-fibre crosstalk and detector models; decoy-state (GLLP) secure-key-rate module, being validated against published experimental benchmarks.",
+  services: "Freelance: AI automation & agents · generative AI content (reels, ComfyUI) · debugging & API audits · AI consulting. Type `open services` for details.",
   skills: "Python · NumPy · FastAPI · RAG/FAISS · MCP · local LLMs (Ollama) · BB84/QKD · Quantum ESPRESSO · TVD · Sputtering · XRD/FESEM/EDX",
   projects: "QKD simulator (NSUT/TTDF) · BRAHM — 5-agent AI research ecosystem · Brahmshilp — 3D/WebGL character lab. Try: qkd, brahm, brahmshilp",
   brahm: "BRAHM — 5 agents (SHANI, VISHWAKARMA, VIDUR, CHITRAGUPTA, GANESH), 52+ MCP tools, RAG + DFT orchestration. Type `open brahm` for details.",
   brahmshilp: "Brahmshilp — the visual 3D layer of BRAHM: GLB assets, WebGL scenes, animation, and AI-assisted worldbuilding.",
   contact: "shardulkhanduriphy@gmail.com · github.com/Shardul-collab · +91 84450 31524",
-  ls: "About.txt  Resume.pdf  Research/  BRAHM/  Brahmshilp/  skills.sh  Contact.app  RubbleRun.exe  music.exe  yard.exe",
+  ls: "About.txt  Resume.pdf  Research/  BRAHM/  Brahmshilp/  Services.app  skills.sh  Contact.app  RubbleRun.exe  music.exe  yard.exe",
   sudo: "Nice try. You already have full access — just click around.",
   yard: "yard.exe — click the grass to throw a ball, tap a dog to say hi, click the clock to skip ahead 6 hours. The sky follows your local time.",
 };
-const openAliases = { about:'about', resume:'resume', research:'research', brahm:'brahm', brahmshilp:'brahmshilp', skills:'skills', contact:'contact', game:'game', rubblerun:'game', music:'player', player:'player' };
+const openAliases = { about:'about', resume:'resume', research:'research', brahm:'brahm', brahmshilp:'brahmshilp', services:'services', freelance:'services', skills:'skills', contact:'contact', game:'game', rubblerun:'game', music:'player', player:'player' };
 const history = [];
 let histIdx = 0;
 let typing = null;
