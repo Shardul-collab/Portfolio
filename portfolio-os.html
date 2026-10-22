@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>shardul@brahm: ~ — BrahmShilp</title>
-<meta name="description" content="Shardul Khanduri — physicist and agentic-AI builder. Quantum key distribution simulation, thin-film fabrication, DFT, and BRAHM, a multi-agent AI research system.">
+<meta name="description" content="Shardul Khanduri — physicist and agentic-AI builder. Freelance AI automation, generative AI content and debugging. Quantum key distribution simulation, thin-film fabrication, DFT, and BRAHM, a multi-agent AI research system.">
 <meta property="og:title" content="BrahmShilp — Shardul Khanduri">
 <meta property="og:description" content="Physicist and agentic-AI builder. QKD simulation, thin-film fabrication, DFT, and BRAHM, a multi-agent AI research system.">
 <meta property="og:type" content="website">
@@ -192,13 +192,14 @@
   }
 
   /* ============ APP TILES: palette borrowed from yard.exe's sky ============
-     Each app gets its own "time of day" so the row reads as eight distinct
-     objects instead of eight identical dark squares. Same vars feed the dock. */
+     Each app gets its own "time of day" so the row reads as nine distinct
+     objects instead of nine identical dark squares. Same vars feed the dock. */
   [data-open="about"]     { --t1:#8a3a44; --t2:#d7814a; --ink:#FFF1DD; --glow:217,129,74; }   /* dawn   */
   [data-open="resume"]    { --t1:#3e5f7c; --t2:#7fa0b6; --ink:#F7F3E8; --glow:127,160,182; }  /* day    */
   [data-open="research"]  { --t1:#3a1c3e; --t2:#b4533a; --ink:#FFD9BD; --glow:180,83,58; }    /* dusk   */
   [data-open="brahm"]     { --t1:#f0c64a; --t2:#9a6a12; --ink:#1d1405; --glow:240,198,74; }   /* sun    */
   [data-open="brahmshilp"]{ --t1:#1c1f42; --t2:#3d3a78; --ink:#EDE6CF; --glow:120,112,210; }  /* night  */
+  [data-open="services"]  { --t1:#173f4a; --t2:#3f9a9c; --ink:#E9FBF7; --glow:63,154,156; }   /* lake   */
   [data-open="skills"]    { --t1:#1d4a2a; --t2:#4f8f52; --ink:#ECF7D6; --glow:96,160,90; }    /* meadow */
   [data-open="terminal"]  { --t1:#0b0d1a; --t2:#1d2036; --ink:#F6E27A; --glow:246,226,122; }  /* fireflies */
   [data-open="contact"]   { --t1:#5c2430; --t2:#e08a4f; --ink:#FFF4E2; --glow:224,138,79; }   /* sunset */
@@ -436,29 +437,33 @@
      A tiny simulated world drawn to a low-res canvas and upscaled with
      nearest-neighbour, so every element snaps to the same pixel grid. */
   #terrarium{
-    position:fixed; right:22px; bottom:78px; z-index:600;
-    width:236px; height:132px; border-radius:10px; overflow:hidden;
+    /* a long strip across the bottom of the desktop, sitting behind the
+       windows (z 100+) so it reads as part of the scene, not a popup */
+    position:fixed; left:22px; right:22px; bottom:78px; z-index:50;
+    height:clamp(150px, 24vh, 210px); border-radius:10px; overflow:hidden;
     border:1px solid var(--glass-border); box-shadow:var(--shadow-lg);
     background:#0c0d16; cursor:pointer; outline:none;
     transition:box-shadow var(--t-base) ease, border-color var(--t-base) ease, transform var(--t-base) var(--spring);
   }
+  /* short laptop screens: keep the strip clear of the default widgets */
+  @media (max-height:780px) and (min-width:641px){ #terrarium{ height:140px; } }
   #terrarium:hover{ border-color:var(--crimson-dim); box-shadow:var(--shadow-xl); }
   #terrarium:focus-visible{ border-color:var(--plasma); }
   #yard-canvas{ width:100%; height:100%; display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
   #terrarium .tt-bar{
     position:absolute; top:5px; left:6px; right:6px; display:flex; justify-content:space-between; align-items:center;
-    pointer-events:none; font-size:9px; letter-spacing:0.06em; text-transform:uppercase;
+    pointer-events:none; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase;
   }
   #terrarium .tt-label{ color:rgba(255,255,255,0.6); text-shadow:0 1px 2px rgba(0,0,0,0.7); }
   #terrarium .tt-clock{
     pointer-events:auto; cursor:pointer; color:rgba(255,255,255,0.72);
     background:rgba(8,8,14,0.45); border:1px solid rgba(255,255,255,0.10); border-radius:4px;
-    padding:2px 5px; font-family:'JetBrains Mono', monospace; font-size:9px; letter-spacing:0.04em; text-transform:none;
+    padding:2px 5px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.04em; text-transform:none;
     transition:background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
   }
   #terrarium .tt-clock:hover{ background:rgba(8,8,14,0.7); border-color:var(--crimson-dim); color:var(--text); }
   #terrarium .tt-hint{
-    position:absolute; left:6px; bottom:5px; font-size:8.5px; color:rgba(255,255,255,0.7);
+    position:absolute; left:8px; bottom:6px; font-size:10px; color:rgba(255,255,255,0.7);
     text-shadow:0 1px 2px rgba(0,0,0,0.9); pointer-events:none; letter-spacing:0.03em;
     opacity:0; transform:translateY(3px); transition:opacity var(--t-base) ease, transform var(--t-base) var(--ease-out);
   }
@@ -468,7 +473,7 @@
   @media (max-width:640px){ #terrarium .tt-hint{ display:none; } #terrarium .tt-label{ display:none; } }
   .yard-bubble{
     position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
-    font-size:9px; line-height:1; color:#F3ECD9; background:#14161d; border:1px solid #2C3138;
+    font-size:11px; line-height:1; color:#F3ECD9; background:#14161d; border:1px solid #2C3138;
     padding:3px 5px; border-radius:3px; transform-origin:50% 100%;
     opacity:0; transform:translate(-50%,-100%) scale(0.6);
     transition:opacity 120ms ease, transform 260ms var(--spring);
@@ -487,7 +492,7 @@
     #topbar .sysicons{ display:none; }
     #topbar .left, #nowplaying{ white-space:nowrap; }
     .stat-row{ gap:14px 26px; }
-    #terrarium{ right:12px; bottom:76px; width:168px; height:100px; }
+    #terrarium{ left:12px; right:12px; bottom:76px; height:130px; }
   }
 
   /* ============ CINEMATIC GATE INTRO ============ */
@@ -792,6 +797,7 @@
   <div class="icon" data-open="research" tabindex="0"><div class="glyph cyan">▣</div><div class="lbl">Research/</div></div>
   <div class="icon" data-open="brahm" tabindex="0"><div class="glyph red">◈</div><div class="lbl">BRAHM/</div></div>
   <div class="icon" data-open="brahmshilp" tabindex="0"><div class="glyph ember">✺</div><div class="lbl">Brahmshilp/</div></div>
+  <div class="icon" data-open="services" tabindex="0"><div class="glyph cyan">⚙</div><div class="lbl">Services.app</div></div>
   <div class="icon" data-open="skills" tabindex="0"><div class="glyph cyan">$</div><div class="lbl">skills.sh</div></div>
   <div class="icon" data-open="terminal" tabindex="0"><div class="glyph red">▶</div><div class="lbl">Terminal</div></div>
   <div class="icon" data-open="contact" tabindex="0"><div class="glyph ember">✉</div><div class="lbl">Contact.app</div></div>
@@ -814,6 +820,7 @@
   <div class="dock-btn" data-open="research" tabindex="0" role="button" aria-label="Research"><span class="ico">▣</span><span class="tip">Research</span></div>
   <div class="dock-btn" data-open="brahm" tabindex="0" role="button" aria-label="BRAHM"><span class="ico">◈</span><span class="tip">BRAHM</span></div>
   <div class="dock-btn" data-open="brahmshilp" tabindex="0" role="button" aria-label="Brahmshilp"><span class="ico">✺</span><span class="tip">Brahmshilp</span></div>
+  <div class="dock-btn" data-open="services" tabindex="0" role="button" aria-label="Services"><span class="ico">⚙</span><span class="tip">Services</span></div>
   <div class="dock-btn" data-open="skills" tabindex="0" role="button" aria-label="Skills"><span class="ico">$</span><span class="tip">Skills</span></div>
   <div class="dock-btn" data-open="terminal" tabindex="0" role="button" aria-label="Terminal"><span class="ico">▶</span><span class="tip">Terminal</span></div>
   <div class="dock-btn" data-open="contact" tabindex="0" role="button" aria-label="Contact"><span class="ico">✉</span><span class="tip">Contact</span></div>
@@ -831,6 +838,7 @@
     <p class="meta-row">Delhi, India · shardulkhanduriphy@gmail.com · github.com/Shardul-collab</p>
     <p>Physicist who has fabricated gas-sensing thin films by hand and now simulates quantum-secured optical networks — and an engineer building multi-agent AI systems to automate the science around both. This site is the bridge between those things: one lab, one terminal.</p>
     <p><span class="now-badge">now</span> Junior Research Fellow at NSUT, building an indigenous BB84 QKD network simulator on a TTDF-sponsored project.</p>
+    <p><span class="now-badge">freelance</span> Taking on AI automation, generative-AI content and debugging work. Open <span class="tag">Services.app</span> for what I build and the projects behind it.</p>
     <p style="color:var(--faint); font-size:11.5px;">tip: open <span class="tag">Terminal</span> and try <span class="tag">whoami</span></p>
   </div>
 </div>
@@ -927,16 +935,56 @@
   </div>
   <div class="win-body">
     <h3>Brahmshilp</h3>
-    <p class="meta-row">3D Character Lab · AI Assets · WebGL</p>
-    <div class="brahmshilp-card">
-      <span class="model-badge">live asset</span>
-      <p><strong>Cybernetic Trimurti</strong> — generated as a real 3D mesh and rendered in-browser with Three.js.</p>
-      <p style="margin-top:8px;color:var(--faint);font-size:11.5px;">Asset: Meshy-generated GLB · Meshopt-compressed · WebGL renderer</p>
-    </div>
-    <p>Brahmshilp is the visual layer of BRAHM: characters, environments, animation, and interactive research storytelling built as actual 3D assets rather than AI-generated video.</p>
-    <p>An AI-generated animated character I write, design, and edit myself — the public-facing voice for a private thesis: that research doesn't have to stay locked inside papers and labs. Each piece is built the same way BRAHM is: AI tools doing the heavy lifting, a human architect deciding what's worth saying.</p>
-    <p>Next layer: Blender rigging → procedural animation → MCP-controlled scene authoring → Three.js runtime.</p>
+    <p class="meta-row">Character concept · Spokesperson of BRAHM</p>
+    <p>Brahmshilp is a character, not a single video or 3D model. He is the face and voice of BRAHM — the spokesperson who explains what it does and why it matters.</p>
+    <p>He carries a thesis I care about: research doesn't have to stay locked inside papers and labs. I write him, design him and decide what he says. Whatever form he shows up in — a post, a reel, this site — it's the same character speaking.</p>
     <a class="btnlink" href="https://www.instagram.com/brahmashilp/" target="_blank" rel="noopener">@ instagram — Brahmshilp ↗</a>
+  </div>
+</div>
+
+<div class="win" id="win-services" style="top:96px; left:20%;">
+  <div class="win-head" data-drag>
+    <div class="win-title"><span class="tdot" style="background:var(--plasma)"></span>Services.app</div>
+    <div class="win-controls"><button data-close>✕</button></div>
+  </div>
+  <div class="win-body">
+    <h3>Freelance — AI Automation, GenAI &amp; Debugging</h3>
+    <p class="meta-row">Available for freelance projects · Remote</p>
+    <p>I build AI systems that do real work end to end, and I fix the ones that don't. Every service below is backed by something I've built and run myself.</p>
+    <div class="agents">
+      <div class="agent"><b>AI AUTOMATION</b><span>agents, API pipelines, MCP tools, Notion &amp; data workflows</span></div>
+      <div class="agent"><b>GENERATIVE AI</b><span>AI reels, ComfyUI / AnimateDiff pipelines, AI content</span></div>
+      <div class="agent"><b>DEBUGGING</b><span>Python &amp; FastAPI bugs, API audits, async issues</span></div>
+      <div class="agent"><b>AI CONSULTING</b><span>setting up AI in your workflow, coaching</span></div>
+    </div>
+
+    <h4>AI Automation &amp; Agents</h4>
+    <ul>
+      <li>Multi-agent systems and LLM workflows wired into real tools through APIs and the Model Context Protocol (MCP).</li>
+      <li>Data pipelines that collect, filter and extract from documents — text, tables and equations out of PDFs (PyMuPDF, Camelot, pix2tex).</li>
+      <li>Voice and chat assistants that log into Notion or a database (Whisper speech-to-text, intent classification).</li>
+      <li>Local / private LLM setups with Ollama when data can't leave your machine.</li>
+    </ul>
+    <p class="meta-row"><strong>Proof:</strong> BRAHM — 5 agents, 52+ MCP tools, 10,000+ papers pulled automatically from CrossRef, Unpaywall, PubMed and arXiv across 15 parallel workflows.</p>
+
+    <h4>Generative AI Content</h4>
+    <ul>
+      <li>AI-generated short-form reels and edited reels for Instagram and YouTube Shorts.</li>
+      <li>Custom ComfyUI workflows: AnimateDiff, Stable Diffusion 1.5, LoRA — tuned to run on modest GPUs.</li>
+      <li>Script and content planning for AI-driven channels.</li>
+    </ul>
+    <p class="meta-row"><strong>Proof:</strong> MangaMotion AI — a ComfyUI + AnimateDiff pipeline that animates static manga panels into reels, built to run on a 4&nbsp;GB GPU. Brahmshilp — the character I created as BRAHM's spokesperson.</p>
+
+    <h4>Debugging &amp; Code Audits</h4>
+    <ul>
+      <li>Find and fix bugs in Python, FastAPI and AI-agent codebases — reproduced first, fixed second, verified after.</li>
+      <li>Security and reliability audits of APIs: CORS, authentication, concurrency and data-integrity issues.</li>
+      <li>Validating scientific and numerical code against published reference results.</li>
+    </ul>
+    <p class="meta-row"><strong>Proof:</strong> audited Chitragupta (BRAHM's voice-logging API) and fixed 6 critical issues — a CORS misconfiguration, a timing-attack-prone API-key check, a double-write that corrupted records, and speech processing that blocked the async server. Validated a QKD key-rate module against published experiments.</p>
+
+    <hr class="divider">
+    <a class="btnlink" href="mailto:shardulkhanduriphy@gmail.com?subject=Freelance%20project%20enquiry">Start a project ↗</a>
   </div>
 </div>
 
@@ -952,6 +1000,13 @@
       <span class="chip">FastAPI</span><span class="chip">SQLite</span><span class="chip">MCP</span>
       <span class="chip">Multi-Agent Systems</span><span class="chip">FAISS</span><span class="chip">RAG</span>
       <span class="chip">NumPy</span><span class="chip">Local LLMs (Ollama)</span><span class="chip">Three.js / WebGL</span>
+    </div>
+    <h4>Automation &amp; Generative AI</h4>
+    <div class="chips">
+      <span class="chip">LLM Agents</span><span class="chip">Prompt Engineering</span><span class="chip">QLoRA Fine-Tuning</span>
+      <span class="chip">Whisper</span><span class="chip">REST API Integration</span><span class="chip">Notion API</span>
+      <span class="chip">PDF Extraction</span><span class="chip">ComfyUI</span><span class="chip">AnimateDiff</span>
+      <span class="chip">Stable Diffusion / LoRA</span><span class="chip">Debugging &amp; API Audits</span>
     </div>
     <h4>Quantum Communication</h4>
     <div class="chips">
@@ -1054,8 +1109,8 @@
     <div class="win-controls"><button data-close>✕</button></div>
   </div>
   <div class="win-body">
-    <h3>Let's talk research, systems, or both.</h3>
-    <p>Open to research collaborations, DFT/agentic-AI tooling discussions, and anything at the edge of the two.</p>
+    <h3>Let's talk research, systems, or a project.</h3>
+    <p>Open to freelance work in AI automation, generative AI and debugging, research collaborations, and DFT/agentic-AI tooling discussions.</p>
     <p><a href="mailto:shardulkhanduriphy@gmail.com">shardulkhanduriphy@gmail.com</a></p>
     <p><a href="https://github.com/Shardul-collab" target="_blank" rel="noopener">github.com/Shardul-collab</a></p>
     <p><a href="tel:+918445031524">+91 84450 31524</a></p>
@@ -1877,20 +1932,21 @@ document.querySelectorAll('.win').forEach(w=>{
 const termLog = document.getElementById('term-log');
 const termInput = document.getElementById('term-input');
 const commands = {
-  help: "Available: whoami, now, projects, qkd, brahm, brahmshilp, skills, contact, yard, open <app>, ls, clear",
+  help: "Available: whoami, now, projects, services, qkd, brahm, brahmshilp, skills, contact, yard, open <app>, ls, clear",
   whoami: "Shardul Khanduri — physicist building quantum-communication simulators by day and agentic AI for science by night. Still deciding whether the dog or the robot dog is the better metaphor for that.",
   now: "JRF @ NSUT on a TTDF-sponsored quantum-communication project — building an indigenous BB84 QKD network simulator. Evenings: pushing BRAHM toward TRL 5.",
   qkd: "BB84 QKD network simulator — source, fibre, PMD, multicore-fibre crosstalk and detector models; decoy-state (GLLP) secure-key-rate module, being validated against published experimental benchmarks.",
+  services: "Freelance: AI automation & agents · generative AI content (reels, ComfyUI) · debugging & API audits · AI consulting. Type `open services` for details.",
   skills: "Python · NumPy · FastAPI · RAG/FAISS · MCP · local LLMs (Ollama) · BB84/QKD · Quantum ESPRESSO · TVD · Sputtering · XRD/FESEM/EDX",
-  projects: "QKD simulator (NSUT/TTDF) · BRAHM — 5-agent AI research ecosystem · Brahmshilp — 3D/WebGL character lab. Try: qkd, brahm, brahmshilp",
+  projects: "QKD simulator (NSUT/TTDF) · BRAHM — 5-agent AI research ecosystem · Brahmshilp — the spokesperson character of BRAHM. Try: qkd, brahm, brahmshilp",
   brahm: "BRAHM — 5 agents (SHANI, VISHWAKARMA, VIDUR, CHITRAGUPTA, GANESH), 52+ MCP tools, RAG + DFT orchestration. Type `open brahm` for details.",
-  brahmshilp: "Brahmshilp — the visual 3D layer of BRAHM: GLB assets, WebGL scenes, animation, and AI-assisted worldbuilding.",
+  brahmshilp: "Brahmshilp — a character concept and the spokesperson of BRAHM. Not a video, not a 3D asset: the voice that explains what BRAHM does. Type `open brahmshilp` for more.",
   contact: "shardulkhanduriphy@gmail.com · github.com/Shardul-collab · +91 84450 31524",
-  ls: "About.txt  Resume.pdf  Research/  BRAHM/  Brahmshilp/  skills.sh  Contact.app  RubbleRun.exe  music.exe  yard.exe",
+  ls: "About.txt  Resume.pdf  Research/  BRAHM/  Brahmshilp/  Services.app  skills.sh  Contact.app  RubbleRun.exe  music.exe  yard.exe",
   sudo: "Nice try. You already have full access — just click around.",
   yard: "yard.exe — click the grass to throw a ball, tap a dog to say hi, click the clock to skip ahead 6 hours. The sky follows your local time.",
 };
-const openAliases = { about:'about', resume:'resume', research:'research', brahm:'brahm', brahmshilp:'brahmshilp', skills:'skills', contact:'contact', game:'game', rubblerun:'game', music:'player', player:'player' };
+const openAliases = { about:'about', resume:'resume', research:'research', brahm:'brahm', brahmshilp:'brahmshilp', services:'services', freelance:'services', skills:'skills', contact:'contact', game:'game', rubblerun:'game', music:'player', player:'player' };
 const history = [];
 let histIdx = 0;
 let typing = null;
@@ -2017,11 +2073,15 @@ playerBar.addEventListener('click', (e)=>{
   const wl = document.createElement('canvas');
   const wctx = wl.getContext('2d');
 
-  let W = 176, H = 99, GY = 61, LANE = [79, 85], BALL_LANE = 82;
+  // The yard is 62 logical pixels tall whatever its size, so each pixel
+  // (and each dog) is drawn ~3x bigger on a desktop; the width in logical
+  // pixels follows the box, so a wide box means a longer yard, not a stretch.
+  let W = 176, H = 62, GY = 38, LANE = [50, 54], BALL_LANE = 52;
   function fit(){
     const r = box.getBoundingClientRect();
-    W = 176;
-    H = Math.max(80, Math.round(W * (r.height || 132) / (r.width || 236)));
+    const scale = (r.height || 186) / 62;
+    H = 62;
+    W = Math.max(120, Math.round((r.width || 600) / scale));
     cv.width = wl.width = W; cv.height = wl.height = H;
     GY = Math.round(H * 0.62);
     LANE = [Math.round(H * 0.80), Math.round(H * 0.87)];
@@ -2087,21 +2147,26 @@ playerBar.addEventListener('click', (e)=>{
 
   // ---------- static scenery (rebuilt on resize) ----------
   let stars = [], hillsFar = [], hillsNear = [], tufts = [], flowers = [], specks = [], flies = [];
-  const clouds = [{ x: 14, y: 10, w: 12, s: 2.2 }, { x: 70, y: 20, w: 16, s: 1.4 }, { x: 130, y: 7, w: 9, s: 3.0 }];
+  const CLOUDS = [{ x: 14, y: 8, w: 12, s: 2.2 }, { x: 70, y: 16, w: 16, s: 1.4 }, { x: 130, y: 6, w: 9, s: 3.0 }];
+  let clouds = CLOUDS;
   let seed = 7;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   function buildStatic(){
     seed = 7;
-    stars = Array.from({ length: 28 }, () => ({ x: Math.floor(rnd() * W), y: Math.floor(rnd() * (GY - 14)), p: rnd() * 6.28, r: 0.6 + rnd() * 1.6, big: rnd() < 0.15 }));
+    // keep the scenery as dense as the original 176-px yard
+    const k = Math.max(1, W / 176), n = c => Math.round(c * k);
+    clouds = [];
+    for(let rep = 0; rep < Math.ceil(k); rep++) CLOUDS.forEach(c => clouds.push({ ...c, x: c.x + rep * 176 }));
+    stars = Array.from({ length: n(28) }, () => ({ x: Math.floor(rnd() * W), y: Math.floor(rnd() * (GY - 14)), p: rnd() * 6.28, r: 0.6 + rnd() * 1.6, big: rnd() < 0.15 }));
     hillsFar = []; hillsNear = [];
     for(let x = 0; x < W; x++){
       hillsFar.push(Math.round(GY - 9 - 5 * Math.sin(x * 0.045 + 1.2) - 3 * Math.sin(x * 0.11 + 0.4)));
       hillsNear.push(Math.round(GY - 3 - 3 * Math.sin(x * 0.07 + 2.6) - 1.5 * Math.sin(x * 0.19)));
     }
-    tufts = Array.from({ length: 26 }, () => ({ x: Math.floor(rnd() * W), y: GY + 3 + Math.floor(rnd() * (H - GY - 5)), h: 2 + Math.floor(rnd() * 2) }));
-    flowers = Array.from({ length: 5 }, (_, i) => ({ x: Math.floor(10 + rnd() * (W - 20)), y: GY + 4 + Math.floor(rnd() * (H - GY - 8)), c: i % 2 ? '#C9A227' : '#C2703D' }));
-    specks = Array.from({ length: 30 }, () => ({ x: Math.floor(rnd() * W), y: GY + 2 + Math.floor(rnd() * (H - GY - 2)), c: rnd() < 0.5 ? '#22461f' : '#2e5a33' }));
-    flies = Array.from({ length: 8 }, () => ({ bx: rnd() * W, by: GY + 2 + rnd() * (H - GY - 10), p: rnd() * 6.28, s: 0.4 + rnd() * 0.5 }));
+    tufts = Array.from({ length: n(26) }, () => ({ x: Math.floor(rnd() * W), y: GY + 3 + Math.floor(rnd() * (H - GY - 5)), h: 2 + Math.floor(rnd() * 2) }));
+    flowers = Array.from({ length: n(5) }, (_, i) => ({ x: Math.floor(10 + rnd() * (W - 20)), y: GY + 4 + Math.floor(rnd() * (H - GY - 8)), c: i % 2 ? '#C9A227' : '#C2703D' }));
+    specks = Array.from({ length: n(30) }, () => ({ x: Math.floor(rnd() * W), y: GY + 2 + Math.floor(rnd() * (H - GY - 2)), c: rnd() < 0.5 ? '#22461f' : '#2e5a33' }));
+    flies = Array.from({ length: n(8) }, () => ({ bx: rnd() * W, by: GY + 2 + rnd() * (H - GY - 10), p: rnd() * 6.28, s: 0.4 + rnd() * 0.5 }));
   }
 
   // ---------- dogs ----------
